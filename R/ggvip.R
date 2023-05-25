@@ -1,107 +1,211 @@
 #' Variable Importance GGPlot
 #' @name ggvip
-#' @importFrom randomForest varImpPlot
-#' @importFrom dplyr %>%
-#' @importFrom ggplot2 ggplot geom_point xlim ylab ggtitle theme aes_string
+#' @importFrom randomForest importance
+#' @importFrom dplyr %>% arrange desc filter
+#' @importFrom ggplot2 ggplot geom_point xlim xlab ylab ggtitle theme
+#'   aes_string element_text
 #' @importFrom gridExtra grid.arrange
-#' @description Dotchart of variable importance as measured by a Random Forest
+#' @importFrom wrapr orderv
+#' @importFrom plyr round_any
+#' @description A ggplot of variable importance as measured by a Random Forest.
 #' @param x An object of class randomForest.
-#' @param ... Arguments to be passed to the generic plot function, such as
-#' \link{graphical parameters}. Generic plot will accept many arguments
-#' including the following:
-#'
-#' \code{main}: an overall title for the plot: see \link{title}.
-#'
-#' \code{sub}: a sub title for the plot: see \link{title}.
-#'
-#' \code{xlab}: a title for the x axis: see \link{title}.
-#'
-#' \code{ylab}: a title for the y axis: see \link{title}.
-#' @return A plot of a 'carsimr' object with cells of white open spaces, blue
-#'   cars, and red cars. Plotted lines separate and distinguish unique rows and
-#'   columns.
+#' @param scale For permutation based measures such as MSE or Accuracy, should
+#'   the measures be divided by their "standard errors"? Default is False.
+#' @param sqrt Boolean value indicating whether importance metrics should be
+#'   adjusted via a square root transformation. Default is True.
+#' @param type either 1 or 2, specifying the type of importance measure
+#'   (1=mean decrease in accuracy or % increase in MSE, 2 = mean decrease in
+#'   node impurity or mean decrease in gini). Default is "both".
+#' @param n_var Optional argument for reducing the number of variables to the
+#'   top 'n_var'. Must be an integer between 1 and the total number of predictor
+#'   variables in the model.
+#' @return A ggplot dotchart showing the importance of the variables that were
+#'   plotted.
 #' @examples
-#' rf <- randomForest(factor(Species) ~ ., importance = T, data = iris)
-#' ggvip(rf, scale = F, sqrt = T, metrics = "both")
+#' rf <- randomForest::randomForest(factor(Species) ~ .,
+#'   importance = TRUE,
+#'   data = iris
+#' )
+#' ggvip(rf, scale = FALSE, sqrt = TRUE, type = "both")
 #' @export
 
-ggvip <- function(x, scale = F, sqrt = T, metrics = "both", ...) {
-  vf <- as.data.frame(randomForest::varImpPlot(x, scale = scale))
-  vf0 <- data.frame(matrix(0, nrow = nrow(vf), ncol = ncol(vf)))
-  vf <- pmax(vf, vf0)
+ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", n_var) {
+  imp_values <- as.data.frame(randomForest::importance(x, scale = scale))
 
-  if (sqrt == T) {
-    vf <- sqrt(vf)
+  num_cols <- ncol(imp_values)
+  imp_values <- imp_values[(num_cols - 1):num_cols]
+
+  imp0 <- imp_values
+  imp0[, ] <- 0
+  imp_frame <- pmax(imp_values, imp0)
+
+  if (sqrt == TRUE) {
+    imp_frame <- sqrt(imp_frame)
   }
 
-  vf$var <- rownames(vf)
+  imp_frame$var <- rownames(imp_frame)
 
-  if (length(colnames(vf)) == 2) {
-    vf <- vf[order(vf[1]), ]
-    vf$var <- factor(vf$var, levels = c(rownames(vf)))
+  if (!missing(n_var)) {
+    d <- imp_frame %>%
+      arrange(desc(get(colnames(imp_frame)[1]))) %>%
+      filter(get(colnames(imp_frame)[1]) >= get(colnames(imp_frame)[1])[n_var])
 
-    vf %>% ggplot(aes_string(x = colnames(vf)[1], y = colnames(vf)[2])) +
+    imp_frame <- imp_frame %>%
+      filter(var %in% d$var)
+  }
+
+  if (length(colnames(imp_frame)) == 2) {
+    imp_frame <- imp_frame[wrapr::orderv(imp_frame[1]), ]
+    imp_frame$var <- factor(imp_frame$var, levels = c(rownames(imp_frame)))
+
+    # new
+    m <- max(imp_frame[1])
+    v <- 10^(-3:6)
+    ind <- findInterval(m, v)
+
+    newr <- m / (10^(ind - 5))
+    rrr <- round_any(newr, 10, ceiling)
+
+    if(newr/rrr < 3/4){
+      rrr <- round_any(newr, 4, ceiling)
+    }
+
+    newm <- rrr * (10^(ind - 5))
+
+    div <- ifelse(0 == (rrr / 5) %% 5, 5,
+      ifelse(0 == (rrr / 5) %% 4, 4,
+        ifelse(0 == (rrr / 5) %% 3, 3, 4)
+      )
+    )
+    # end
+
+    g <- imp_frame %>%
+      ggplot(aes_string(
+        x = colnames(imp_frame)[1],
+        y = colnames(imp_frame)[2]
+      )) +
       geom_point() +
-      xlim(0, max(vf[1])) +
+      scale_x_continuous(
+        limits = c(0, newm),
+        breaks = seq(0, newm, by = newm / div)
+      ) +
       ylab(NULL) +
+      xlab(ifelse(sqrt == FALSE, colnames(imp_frame)[1],
+        paste0("sqrt(", colnames(imp_frame)[1], ")")
+      )) +
       ggtitle("VIP") +
       theme(plot.title = element_text(hjust = 0.5))
+
+    l <- list()
+    l$vip <- g
+    l$table <- imp_frame
+    l
   } else {
-    vf <- vf[order(vf[1]), ]
-    vf$var <- factor(vf$var, levels = c(rownames(vf)))
+    imp_frame <- imp_frame[wrapr::orderv(imp_frame[1]), ]
+    imp_frame$var <- factor(imp_frame$var, levels = c(rownames(imp_frame)))
 
-    if (colnames(vf)[1] == "%IncMSE") {
-      colnames(vf)[1] <- "IncMSE"
+    if (colnames(imp_frame)[1] == "%IncMSE") {
+      colnames(imp_frame)[1] <- "PctIncMSE"
     }
 
-    g <- vf %>% ggplot(aes_string(x = colnames(vf)[1], y = colnames(vf)[3])) +
+    # new
+    m <- max(imp_frame[1])
+    v <- 10^(-3:6)
+    ind <- findInterval(m, v)
+
+    newr <- m / (10^(ind - 5))
+    rrr <- round_any(newr, 10, ceiling)
+
+    if(newr/rrr < 3/4){
+      rrr <- round_any(newr, 4, ceiling)
+    }
+
+    newm <- rrr * (10^(ind - 5))
+
+    div <- ifelse(0 == (rrr / 5) %% 5, 5,
+                  ifelse(0 == (rrr / 5) %% 4, 4,
+                         ifelse(0 == (rrr / 5) %% 3, 3, 4)
+                  )
+    )
+    # end
+
+    imp_frame1 <- imp_frame
+
+    imp_frame1 <- imp_frame1[rev(wrapr::orderv(imp_frame1[1])), ]
+
+    g1 <- imp_frame %>%
+      ggplot(aes_string(
+        x = colnames(imp_frame)[1],
+        y = colnames(imp_frame)[3]
+      )) +
       geom_point() +
-      xlim(0, max(vf[1])) +
-      ylab(NULL)
+      scale_x_continuous(
+        limits = c(0, newm),
+        breaks = seq(0, newm, by = newm / div)
+      ) +
+      ylab(NULL) +
+      xlab(ifelse(sqrt == FALSE, colnames(imp_frame)[1],
+        paste0("sqrt(", colnames(imp_frame)[1], ")")
+      ))
 
-    vf <- vf[order(vf[2]), ]
-    vf$var <- factor(vf$var, levels = c(rownames(vf)))
+    imp_frame <- imp_frame[wrapr::orderv(imp_frame[2]), ]
+    imp_frame$var <- factor(imp_frame$var, levels = c(rownames(imp_frame)))
 
-    g1 <- vf %>% ggplot(aes_string(x = colnames(vf)[2], y = colnames(vf)[3])) +
+    # new stuff
+    m <- max(imp_frame[2])
+    ind <- findInterval(m, v)
+
+    newr <- m / (10^(ind - 5))
+    rrr <- round_any(newr, 10, ceiling)
+
+    if(newr/rrr < 3/4){
+      rrr <- round_any(newr, 4, ceiling)
+    }
+
+    newm <- rrr * (10^(ind - 5))
+
+    div <- ifelse(0 == (rrr / 5) %% 5, 5,
+                  ifelse(0 == (rrr / 5) %% 4, 4,
+                         ifelse(0 == (rrr / 5) %% 3, 3, 4)
+                  )
+    )
+    # end
+
+    imp_frame2 <- imp_frame
+
+    imp_frame2 <- imp_frame2[rev(wrapr::orderv(imp_frame2[2])), ]
+
+    g2 <- imp_frame %>%
+      ggplot(aes_string(
+        x = colnames(imp_frame)[2],
+        y = colnames(imp_frame)[3]
+      )) +
       geom_point() +
-      xlim(0, max(vf[2])) +
-      ylab(NULL)
+      scale_x_continuous(
+        limits = c(0, newm),
+        breaks = seq(0, newm, by = newm / div)
+      ) +
+      ylab(NULL) +
+      xlab(ifelse(sqrt == FALSE, colnames(imp_frame)[2],
+        paste0("sqrt(", colnames(imp_frame)[2], ")")
+      ))
 
-    if (metrics %in% c("mse", "acc", 1)) {
-      g
-    } else if (metrics %in% c("purity", "gini", 2)) {
-      g1
+    l <- list()
+    if (type %in% c("mse", "acc", 1)) {
+      l$vip <- g1
+      l$table <- imp_frame1[, -2]
+    } else if (type %in% c("purity", "gini", 2)) {
+      l$vip <- g2
+      l$table <- imp_frame2[, -1]
     } else {
-      gridExtra::grid.arrange(g, g1, nrow = 1, top = "VIP")
+      l$both_vips <- gridExtra::grid.arrange(g1, g2,
+        nrow = 1,
+        top = "Variable Importances using ggplot Graphics"
+      )
+      l$accuracy_vip <- g1
+      l$purity_vip <- g2
+      l$table <- imp_frame1
     }
+    l
   }
 }
-ggvip(rf, sqrt = T, metrics = "gini")
-ggvip(rf1, sqrt = T)
-
-
-sig <- diag(1, 5, 5)
-
-strobl <- MASS::mvrnorm(1000, mu = rep(0, 5), Sigma = sig)
-
-y <- 5 * strobl[, 1] + 5 * strobl[, 2] + 3 * strobl[, 3] +
-  3 * strobl[, 4] + rnorm(1000, mean = 0, sd = 1 / 2)
-
-y <- ifelse(y > 0, 1, 0)
-
-strobl <- data.frame(cbind(strobl, y))
-
-rf <- randomForest::randomForest(y ~ ., mtry = 5, importance = T, data = strobl)
-varImpPlot(rf)
-vf <- as.data.frame(varImpPlot(rf))
-vf
-sqrt(vf)
-
-rf1 <- randomForest::randomForest(as.factor(y) ~ .,
-                                  mtry = 5,
-                                  importance = T, data = strobl
-)
-varImpPlot(rf1)
-vf <- as.data.frame(varImpPlot(rf1))
-vf
-sqrt(vf1)

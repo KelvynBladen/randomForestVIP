@@ -4,32 +4,36 @@
 \alias{ggvip}
 \title{Variable Importance GGPlot}
 \usage{
-ggvip(x, scale = F, sqrt = T, metrics = "both", ...)
+ggvip(x, scale = F, sqrt = T, type = "both", n.var)
 }
 \arguments{
 \item{x}{An object of class randomForest.}
 
-\item{...}{Arguments to be passed to the generic plot function, such as
-\link{graphical parameters}. Generic plot will accept many arguments
-including the following:
+\item{scale}{For permutation based measures such as MSE or Accuracy, should
+the measures be divided by their "standard errors"? Default is False.}
 
-\code{main}: an overall title for the plot: see \link{title}.
+\item{sqrt}{Boolean value indicating whether importance metrics should be
+adjusted via a square root transformation. Default is True.}
 
-\code{sub}: a sub title for the plot: see \link{title}.
+\item{type}{either 1 or 2, specifying the type of importance measure
+(1=mean decrease in accuracy or % increase in MSE, 2 = mean decrease in
+node impurity or mean decrease in gini). Default is "both".}
 
-\code{xlab}: a title for the x axis: see \link{title}.
-
-\code{ylab}: a title for the y axis: see \link{title}.}
+\item{n.var}{Optional argument for reducing the number of variables to the
+top 'n.var'. Must be an integer between 1 and the total number of predictor
+variables in the model.}
 }
 \value{
-A plot of a 'carsimr' object with cells of white open spaces, blue
-  cars, and red cars. Plotted lines separate and distinguish unique rows and
-  columns.
+A ggplot dotchart showing the importance of the variables that were
+  plotted.
 }
 \description{
-Dotchart of variable importance as measured by a Random Forest
+A ggplot of variable importance as measured by a Random Forest.
 }
 \examples{
-rf <- randomForest(factor(Species) ~ ., importance = T, data = iris)
-ggvip(rf, scale = F, sqrt = T)
+rf <- randomForest::randomForest(factor(Species) ~ .,
+  importance = TRUE,
+  data = iris
+)
+ggvip(rf, scale = FALSE, sqrt = TRUE, type = "both")
 }
