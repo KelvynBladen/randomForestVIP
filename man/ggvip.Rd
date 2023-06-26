@@ -4,7 +4,7 @@
 \alias{ggvip}
 \title{Variable Importance GGPlot}
 \usage{
-ggvip(x, scale = F, sqrt = T, type = "both", n.var)
+ggvip(x, scale = FALSE, sqrt = TRUE, type = "both", num_var)
 }
 \arguments{
 \item{x}{An object of class randomForest.}
@@ -19,8 +19,8 @@ adjusted via a square root transformation. Default is True.}
 (1=mean decrease in accuracy or % increase in MSE, 2 = mean decrease in
 node impurity or mean decrease in gini). Default is "both".}
 
-\item{n.var}{Optional argument for reducing the number of variables to the
-top 'n.var'. Must be an integer between 1 and the total number of predictor
+\item{num_var}{Optional argument for reducing the number of variables to the
+top 'num_var'. Must be an integer between 1 and the total number of predictor
 variables in the model.}
 }
 \value{

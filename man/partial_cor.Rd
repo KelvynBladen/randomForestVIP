@@ -10,7 +10,7 @@ partial_cor(formula, data = NULL, model = lm, num_var, ...)
 \item{formula}{an object of class "\link{formula}" (or one that can be
 coerced to that class): a symbolic description of the model to be fitted.}
 
-\item{data}{an optional data frame containing the variables in the model.
+\item{data}{a data frame containing the variables in the model.
 By default the variables are taken from the environment which the model
 is called from.}
 

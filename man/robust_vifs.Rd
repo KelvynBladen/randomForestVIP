@@ -4,14 +4,7 @@
 \alias{robust_vifs}
 \title{Non-linear Variance Inflation Factors}
 \usage{
-robust_vifs(
-  formula,
-  data = NULL,
-  model = randomForest,
-  log10 = TRUE,
-  num_var,
-  ...
-)
+robust_vifs(formula, data, model = randomForest, log10 = TRUE, num_var, ...)
 }
 \arguments{
 \item{formula}{an object of class "\link{formula}" (or one that can be

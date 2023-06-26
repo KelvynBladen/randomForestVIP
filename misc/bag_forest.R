@@ -1,5 +1,3 @@
-
-
 # # make parallel
 #
 # # cl<-parallel::makePSOCKcluster(5)
@@ -125,5 +123,3 @@
 #
 # f1 <- randomForest(factor(Species)~., data = iris)
 # f1
-
-

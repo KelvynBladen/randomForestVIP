@@ -1,13 +1,11 @@
-
 #' Mtry Tune via VIPs
 #' @name mtry_compare
 #' @importFrom randomForest importance randomForest
 #' @importFrom ggplotify as.ggplot
 #' @importFrom dplyr %>% arrange across ends_with desc filter select
-#'   summarise group_by
+#'   summarise group_by case_when
 #' @importFrom ggplot2 ggplot geom_point geom_line ylab ggtitle theme
 #'   aes_string scale_x_continuous scale_y_continuous
-#' @importFrom gridExtra arrangeGrob
 #' @importFrom tidyr pivot_wider
 #' @importFrom stats model.frame na.omit quantile
 #' @description A list of data.frames and useful plots for user evaluations of
@@ -37,49 +35,50 @@
 #' m
 #' @export
 
-mtry_compare <- function(formula, data = NULL, scale = F, sqrt = T,
+mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
                          num_var, mvec, ...) {
-
   model_frame <- model.frame(formula, data = data)
   num_preds <- ncol(model_frame) - 1
 
   m1 <- 1
   m2 <- ifelse(class(model_frame[1, 1]) == "numeric" & num_preds > 2,
-               floor(num_preds / 3), floor(sqrt(num_preds))
+    floor(num_preds / 3), floor(sqrt(num_preds))
   )
-
   m3 <- ceiling(mean(c(m2, num_preds)))
+  new_mvec <- sort(unique(c(m1, m2, m3, num_preds)))
 
-  if (!missing(mvec)) {
-    # mvec <- ifelse(all(mvec < 1), round(mvec * num_preds), round(mvec))
-    if (all(mvec < 1)) {
-      mvec <- round(mvec * num_preds)
+  if (missing(mvec)) {
+    mvec <- new_mvec
+  } else {
+    if (all(mvec <= 0)) {
+      mvec <- new_mvec
     } else {
-      mvec <- round(mvec)
+      ifelse(all(floor(mvec) == 0),
+        mvec <- round(mvec * num_preds), mvec <- round(mvec)
+      )
+      mvec <- ifelse(floor((mvec - 1) / num_preds) == 0, mvec, NA) %>%
+        na.omit() %>%
+        unique() %>%
+        sort()
     }
-
-    mvec <- as.vector(sort(unique(na.omit(ifelse(mvec <= num_preds & mvec > 0,
-      mvec, NA
-    )))))
-  } else {
-    mvec <- sort(unique(c(m1, m2, m3, num_preds)))
   }
 
-  # Think can wrap down to 1 if and 1 ifelse statement
-  if (!missing(num_var)) {
-
-    num_var <- ifelse(num_var >= num_preds | num_var <= 0, num_preds,
-                      ifelse(num_var < 1, round(num_var * num_preds),
-                             round(num_var)))
-  } else {
+  ifelse(!missing(num_var),
+    num_var <- ifelse(num_var >= num_preds | num_var <= 0,
+      num_preds,
+      ifelse(num_var < 1,
+        round(num_var * num_preds),
+        round(num_var)
+      )
+    ),
     num_var <- num_preds
-  }
+  )
 
   for (i in mvec) {
     x <- paste0("srf", i)
     eval(call("<-", as.name(x), randomForest(
       formula = formula, mtry = i,
-      importance = T, data = data, ...
+      importance = TRUE, data = data # , ...
     )))
 
     vf <- paste0("sv", i)
@@ -95,7 +94,7 @@ mtry_compare <- function(formula, data = NULL, scale = F, sqrt = T,
     v0 <- data.frame(matrix(0, nrow = nrow(v), ncol = ncol(v)))
     v <- pmax(v, v0)
 
-    if (sqrt == T) {
+    if (sqrt == TRUE) {
       v <- sqrt(v)
     }
 
@@ -105,28 +104,6 @@ mtry_compare <- function(formula, data = NULL, scale = F, sqrt = T,
     y <- get(vf)
     y$mtry <- i
     eval(call("<-", as.name(vf), y))
-
-    h <- paste0("h", i)
-    eval(call(
-      "<-", as.name(h),
-      ggvip(get(x),
-        scale = scale, sqrt = sqrt,
-        type = 1, if (!missing(num_var)) {
-          num_var <- num_var
-          }
-      )
-    ))
-
-    j <- paste0("j", i)
-    eval(call(
-      "<-", as.name(j),
-      ggvip(get(x),
-        scale = scale, sqrt = sqrt,
-        type = 2, if (!missing(num_var)) {
-          num_var <- num_var
-          }
-      )
-    ))
   }
 
   err_v <- 0
@@ -160,7 +137,6 @@ mtry_compare <- function(formula, data = NULL, scale = F, sqrt = T,
 
   if (!missing(num_var)) {
     d <- sd %>%
-      select(names, colnames(sd)[1]) %>%
       group_by(names) %>%
       summarise(mean = mean(get(colnames(sd)[1]))) %>%
       arrange(desc(mean)) %>%
@@ -191,6 +167,24 @@ mtry_compare <- function(formula, data = NULL, scale = F, sqrt = T,
   rownames(n) <- n$names
   n <- n[-1] %>% arrange(desc(across(ends_with(as.character(num_preds)))))
 
+  m <- max(sd[1])
+  v <- 10^(-3:6)
+  ind <- findInterval(m, v)
+
+  newr <- m / (10^(ind - 5))
+  rrr <- plyr::round_any(newr, 10, ceiling)
+
+  rrr <- ifelse(newr / rrr < 3 / 4, plyr::round_any(newr, 4, ceiling), rrr)
+
+  newm <- rrr * (10^(ind - 5))
+
+  div <- case_when(
+    (rrr / 5) %% 5 == 0 ~ 5,
+    (rrr / 5) %% 4 == 0 ~ 4,
+    (rrr / 5) %% 3 == 0 ~ 3,
+    .default = 4
+  )
+
   g1 <- sd %>%
     ggplot(aes_string(
       x = colnames(sd)[4], y = colnames(sd)[1],
@@ -198,9 +192,31 @@ mtry_compare <- function(formula, data = NULL, scale = F, sqrt = T,
     )) +
     geom_point() +
     geom_line() +
-    ylim(0, max(sd[1])) +
-    ggtitle("Variable Importance Based on Decrease in Error Across mtry") +
-    scale_x_continuous(breaks = mvec)
+    scale_x_continuous(breaks = mvec) +
+    scale_y_continuous(
+      limits = c(0, newm),
+      breaks = seq(0, newm, by = newm / div)
+    ) +
+    ggtitle("Variable Importance Based on Decrease in Error Across mtry")
+
+
+  m <- max(sd[2])
+  v <- 10^(-3:6)
+  ind <- findInterval(m, v)
+
+  newr <- m / (10^(ind - 5))
+  rrr <- plyr::round_any(newr, 10, ceiling)
+
+  rrr <- ifelse(newr / rrr < 3 / 4, plyr::round_any(newr, 4, ceiling), rrr)
+
+  newm <- rrr * (10^(ind - 5))
+
+  div <- case_when(
+    (rrr / 5) %% 5 == 0 ~ 5,
+    (rrr / 5) %% 4 == 0 ~ 4,
+    (rrr / 5) %% 3 == 0 ~ 3,
+    .default = 4
+  )
 
   g2 <- sd %>%
     ggplot(aes_string(
@@ -209,123 +225,43 @@ mtry_compare <- function(formula, data = NULL, scale = F, sqrt = T,
     )) +
     geom_point() +
     geom_line() +
-    ylim(0, max(sd[2])) +
+    scale_y_continuous(
+      limits = c(0, newm),
+      breaks = seq(0, newm, by = newm / div)
+    ) +
     ggtitle("Variable Importance Based on Purity Contribution Across mtry") +
     scale_x_continuous(breaks = mvec)
 
-  hl <- list()
-  for (i in seq_len(length(mvec))) {
-    hl[[i]] <- get(paste0("h", mvec[i]))
-  }
 
-  jl <- list()
-  for (i in seq_len(length(mvec))) {
-    jl[[i]] <- get(paste0("j", mvec[i]))
-  }
+  m <- max(err_df[2])
+  v <- 10^(-3:6)
+  ind <- findInterval(m, v)
 
-  mv <- mvec
+  newr <- m / (10^(ind - 5))
+  rrr <- plyr::round_any(newr, 10, ceiling)
 
-  if (length(hl) > 4) {
-    q <- unname(quantile(mvec, c(0.33, 0.67)))
-    u1 <- which.min(abs(mvec[-c(1, length(mvec))] - q[1])) + 1
-    u2 <- which.min(abs(mvec[-c(1, length(mvec))] - q[2])) + 1
-    mv <- mvec[c(1, u1, u2, length(mvec))]
+  rrr <- ifelse(newr / rrr < 3 / 4, plyr::round_any(newr, 4, ceiling), rrr)
 
-    hl[[2]] <- hl[[u1]]
-    hl[[3]] <- hl[[u2]]
-    hl[[4]] <- hl[[length(hl)]]
+  newm <- rrr * (10^(ind - 5))
 
-    jl[[2]] <- jl[[u1]]
-    jl[[3]] <- jl[[u2]]
-    jl[[4]] <- jl[[length(hl)]]
-
-    hl <- hl[1:4]
-    jl <- jl[1:4]
-  }
-
-  if (length(hl) == 4) {
-    g3 <- as.ggplot(arrangeGrob(hl[[1]], hl[[2]],
-      hl[[3]], hl[[4]],
-      nrow = 1,
-      top = paste("mtry: ", mv[1],
-        paste0(", ", mv[-1],
-          collapse = ""
-        ),
-        sep = ""
-      )
-    ))
-
-    g4 <- as.ggplot(arrangeGrob(jl[[1]], jl[[2]],
-      jl[[3]], jl[[4]],
-      nrow = 1,
-      top = paste("mtry: ", mv[1],
-        paste0(", ", mv[-1],
-          collapse = ""
-        ),
-        sep = ""
-      )
-    ))
-  }
-
-  if (length(hl) == 3) {
-    g3 <- as.ggplot(arrangeGrob(hl[[1]], hl[[2]],
-      hl[[3]],
-      nrow = 1,
-      top = paste("mtry: ", mv[1],
-        paste0(", ", mv[-1],
-          collapse = ""
-        ),
-        sep = ""
-      )
-    ))
-
-    g4 <- as.ggplot(arrangeGrob(jl[[1]], jl[[2]],
-      jl[[3]],
-      nrow = 1,
-      top = paste("mtry: ", mv[1],
-        paste0(", ", mv[-1],
-          collapse = ""
-        ),
-        sep = ""
-      )
-    ))
-  }
-
-  if (length(hl) == 2) {
-    g3 <- as.ggplot(arrangeGrob(hl[[1]], hl[[2]],
-      nrow = 1,
-      top = paste("mtry: ", mv[1],
-        paste0(", ", mv[-1],
-          collapse = ""
-        ),
-        sep = ""
-      )
-    ))
-
-    g4 <- as.ggplot(arrangeGrob(jl[[1]], jl[[2]],
-      nrow = 1,
-      top = paste("mtry: ", mv[1],
-        paste0(", ", mv[-1],
-          collapse = ""
-        ),
-        sep = ""
-      )
-    ))
-  }
-
-  if (length(hl) == 1) {
-    g3 <- hl[[1]]
-
-    g4 <- jl[[1]]
-  }
+  div <- case_when(
+    (rrr / 5) %% 5 == 0 ~ 5,
+    (rrr / 5) %% 4 == 0 ~ 4,
+    (rrr / 5) %% 3 == 0 ~ 3,
+    .default = 4
+  )
 
   g_err <- err_df %>%
     ggplot(aes_string(x = colnames(err_df)[1], y = colnames(err_df)[2])) +
     geom_point() +
     geom_line() +
-    ggtitle("Model Errors Across mtry") +
     scale_x_continuous(limits = c(1, num_preds), breaks = mvec) +
-    scale_y_continuous(limits = c(0, 1.25 * max(err_df[colnames(err_df)[2]])))
+    scale_y_continuous(
+      limits = c(0, newm),
+      breaks = seq(0, newm, by = newm / div)
+    ) +
+    ggtitle("Model Errors Across mtry")
+
 
   rownames(sd_full) <- seq_len(nrow(sd_full))
 
@@ -337,8 +273,6 @@ mtry_compare <- function(formula, data = NULL, scale = F, sqrt = T,
   l$var_imp_purity <- n
   l$gg_var_imp_error <- g1
   l$gg_var_imp_purity <- g2
-  l$gg_col_var_imp_error <- g3
-  l$gg_col_var_imp_purity <- g4
   l$gg_model_errors <- g_err
 
   for (i in mvec) {
@@ -349,64 +283,8 @@ mtry_compare <- function(formula, data = NULL, scale = F, sqrt = T,
   l
 }
 
-
 # library(rfvip)
 # m <- mtry_compare(formula = medv ~ ., data = Boston, num_var = 7,
 #                   mvec = c(-1.2, 3, 4, 5, 7, 9, 11.2, 13.3), sqrt = T)
-#
-# m <- mtry_compare(formula = medv ~ ., data = Boston, sqrt = T)
-# m$importance
-# m$gg_var_imp_error
-# m$gg_var_imp_purity
-# m$gg_model_errors
-# m$gg_col_var_imp_error
-# m$gg_col_var_imp_error
-# m <- mtry_compare(formula = factor(Species) ~ ., data = iris, sqrt = T)
-# m
-#
-# mtry_compare_col <- function(formula, data = NULL, scale = F,
-#                              sqrt = T, type = 1) {
-#   mf <- model.frame(formula, data = data)
-#   m <- ncol(mf) - 1
-#
-#   m2 <- floor(sqrt(m))
-#   m3 <- floor(m/3)
-#   m4 <- floor(2*m/3)
-#
-#   for(i in c(m2, m3, m4, m)) {
-#     x <- paste0("srf",i)
-#     eval(call("<-", as.name(x), randomForest(formula = formula, mtry = i,
-#                                              importance = T, data = data)))
-#
-#     y <- paste0("g",i)
-#     eval(call("<-", as.name(y),
-#               rfvip::ggvip(get(x), scale = scale, sqrt = sqrt, type = type)))
-#   }
-#
-#   g1 <- get(paste0("g",m2))
-#   g2 <- get(paste0("g",m3))
-#   g3 <- get(paste0("g",m4))
-#   g4 <- get(paste0("g",m))
-#
-#   gridExtra::grid.arrange(g1, g2, g3, g4, nrow = 1,
-#                           top = paste0("mtry: ", m2,", ", m3,", ",
-#                                        m4,", ", m))
-# }
-
-# data("Boston")
-#
-# mtry_compare(mpg ~ ., data = mtcars, type = 2)
-#
-# # standardize all x variables
-#
-# mtry_compare(medv ~ ., data = Boston, type = 1)
-# mtry_compare_col(medv ~ ., data = Boston, type = 1)
-#
-# B <- as.data.frame(scale(Boston))
-# mtry_compare(medv ~ ., data = B, type = 1)
-# mtry_compare_col(medv ~ ., data = B, type = 1)
-
-# rf <- foreach(mtry = 3, .combine=randomForest::combine,
-#               .multicombine=TRUE, .packages='randomForest') %dopar% {
-#                 randomForest(crim ~ ., Boston, mtry = mtry)
-#               }
+# m <- mtry_compare(formula = medv ~ ., data = Boston, sqrt = F)
+# m <- mtry_compare(formula = factor(Species) ~ ., data = iris, sqrt = TRUE)

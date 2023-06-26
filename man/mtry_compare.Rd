@@ -4,7 +4,15 @@
 \alias{mtry_compare}
 \title{Mtry Tune via VIPs}
 \usage{
-mtry_compare(formula, data = NULL, scale = F, sqrt = T, num_var, mvec, ...)
+mtry_compare(
+  formula,
+  data = NULL,
+  scale = FALSE,
+  sqrt = TRUE,
+  num_var,
+  mvec,
+  ...
+)
 }
 \arguments{
 \item{formula}{an object of class "\link{formula}" (or one that can be

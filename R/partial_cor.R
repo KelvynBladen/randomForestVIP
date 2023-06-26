@@ -1,4 +1,3 @@
-
 #' Partial Correlations
 #' @name partial_cor
 #' @importFrom randomForest randomForest
@@ -13,7 +12,7 @@
 #'   correlations and partial correlations of predictors with a given response.
 #' @param formula an object of class "\link{formula}" (or one that can be
 #'   coerced to that class): a symbolic description of the model to be fitted.
-#' @param data 	an optional data frame containing the variables in the model.
+#' @param data a data frame containing the variables in the model.
 #'   By default the variables are taken from the environment which the model
 #'   is called from.
 #' @param model Model to use for extraction partial correlations. Possible
@@ -34,6 +33,10 @@
 # unsupervised forest MI
 
 partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
+  if (missing(formula)) {
+    stop("formula argument is a required field.")
+  }
+
   l <- list()
 
   mm <- model.matrix(formula, data = data)[, -1]
@@ -48,6 +51,10 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
   }
   # use num_var
 
+  if (!inherits(model, "function")) {
+    warning("model argument should be class function. lm will be used.")
+    model <- lm
+  }
 
   # mark
   mf[1] <- as.numeric(unlist(mf[1]))
@@ -60,7 +67,7 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
   # gini - divide by rows in data
   # Accuracy
   # Scale importances
-  rfu <- randomForest(mf[-1], importance = T)
+  rfu <- randomForest(mf[-1], importance = TRUE)
   imp <- randomForest::importance(rfu)
   rownames(imp) <- rownames(mdf)
   mdf <- cbind(mdf, imp[, 3:4])
@@ -107,6 +114,7 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
         mf[, k] - predict(model(mf[, k] ~ ., mf[, -c(1, k)]))
       )
     }
+
     cdf$part_cor <- ifelse(is.na(cdf$part_cor), 0, cdf$part_cor)
 
     cdf <- cdf[wrapr::orderv(abs(cdf[2])), ]
@@ -221,18 +229,8 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
   l
 }
 
-# library(minerva)
-# library(infotheo)
-# library(entropy)
-# library(rmi)
-
+# library(minerva); library(infotheo); library(entropy); library(rmi)
 # iris1 <- iris %>% filter(Species != "setosa")
-# p <- partial_cor(formula = Petal.Length ~ .,
-#             data = iris1, model = randomForest)
-# p
-# p$y_mutual_info
-# p$plot_mutual_info
-# p$plot_y_part_cors
-# p$plot_y_cors
-# partial_cor(formula = iris$Petal.Length ~ iris$Sepal.Width +
-#               iris$Sepal.Length + iris$Petal.Width)
+# p <- partial_cor(formula = Petal.Length ~ ., data = iris1, model = lm)
+# p1 <- partial_cor(formula = iris$Petal.Length ~ iris$Sepal.Width +
+#   iris$Sepal.Length + iris$Petal.Width)

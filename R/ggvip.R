@@ -1,7 +1,7 @@
 #' Variable Importance GGPlot
 #' @name ggvip
 #' @importFrom randomForest importance
-#' @importFrom dplyr %>% arrange desc filter
+#' @importFrom dplyr %>% arrange desc filter between case_when
 #' @importFrom ggplot2 ggplot geom_point xlim xlab ylab ggtitle theme
 #'   aes_string element_text
 #' @importFrom gridExtra grid.arrange
@@ -16,8 +16,8 @@
 #' @param type either 1 or 2, specifying the type of importance measure
 #'   (1=mean decrease in accuracy or % increase in MSE, 2 = mean decrease in
 #'   node impurity or mean decrease in gini). Default is "both".
-#' @param n_var Optional argument for reducing the number of variables to the
-#'   top 'n_var'. Must be an integer between 1 and the total number of predictor
+#' @param num_var Optional argument for reducing the number of variables to the
+#'   top 'num_var'. Must be an integer between 1 and the total number of predictor
 #'   variables in the model.
 #' @return A ggplot dotchart showing the importance of the variables that were
 #'   plotted.
@@ -29,7 +29,7 @@
 #' ggvip(rf, scale = FALSE, sqrt = TRUE, type = "both")
 #' @export
 
-ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", n_var) {
+ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
   imp_values <- as.data.frame(randomForest::importance(x, scale = scale))
 
   num_cols <- ncol(imp_values)
@@ -45,10 +45,16 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", n_var) {
 
   imp_frame$var <- rownames(imp_frame)
 
-  if (!missing(n_var)) {
+  if (!missing(num_var) && is.numeric(num_var)) {
+    num_var <- ifelse(between(num_var, 1, nrow(imp_frame)),
+      num_var, nrow(imp_frame)
+    )
+    num_var <- round(num_var)
+
     d <- imp_frame %>%
       arrange(desc(get(colnames(imp_frame)[1]))) %>%
-      filter(get(colnames(imp_frame)[1]) >= get(colnames(imp_frame)[1])[n_var])
+      filter(get(colnames(imp_frame)[1]) >=
+               get(colnames(imp_frame)[1])[num_var])
 
     imp_frame <- imp_frame %>%
       filter(var %in% d$var)
@@ -58,26 +64,25 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", n_var) {
     imp_frame <- imp_frame[wrapr::orderv(imp_frame[1]), ]
     imp_frame$var <- factor(imp_frame$var, levels = c(rownames(imp_frame)))
 
-    # new
     m <- max(imp_frame[1])
     v <- 10^(-3:6)
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- round_any(newr, 10, ceiling)
+    rrr <- plyr::round_any(newr, 10, ceiling)
 
-    if(newr/rrr < 3/4){
-      rrr <- round_any(newr, 4, ceiling)
+    if (newr / rrr < 3 / 4) {
+      rrr <- plyr::round_any(newr, 4, ceiling)
     }
 
     newm <- rrr * (10^(ind - 5))
 
-    div <- ifelse(0 == (rrr / 5) %% 5, 5,
-      ifelse(0 == (rrr / 5) %% 4, 4,
-        ifelse(0 == (rrr / 5) %% 3, 3, 4)
-      )
+    div <- case_when(
+      (rrr / 5) %% 5 == 0 ~ 5,
+      (rrr / 5) %% 4 == 0 ~ 4,
+      (rrr / 5) %% 3 == 0 ~ 3,
+      .default = 4
     )
-    # end
 
     g <- imp_frame %>%
       ggplot(aes_string(
@@ -108,26 +113,25 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", n_var) {
       colnames(imp_frame)[1] <- "PctIncMSE"
     }
 
-    # new
     m <- max(imp_frame[1])
     v <- 10^(-3:6)
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- round_any(newr, 10, ceiling)
+    rrr <- plyr::round_any(newr, 10, ceiling)
 
-    if(newr/rrr < 3/4){
-      rrr <- round_any(newr, 4, ceiling)
+    if (newr / rrr < 3 / 4) {
+      rrr <- plyr::round_any(newr, 4, ceiling)
     }
 
     newm <- rrr * (10^(ind - 5))
 
-    div <- ifelse(0 == (rrr / 5) %% 5, 5,
-                  ifelse(0 == (rrr / 5) %% 4, 4,
-                         ifelse(0 == (rrr / 5) %% 3, 3, 4)
-                  )
+    div <- case_when(
+      (rrr / 5) %% 5 == 0 ~ 5,
+      (rrr / 5) %% 4 == 0 ~ 4,
+      (rrr / 5) %% 3 == 0 ~ 3,
+      .default = 4
     )
-    # end
 
     imp_frame1 <- imp_frame
 
@@ -151,25 +155,24 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", n_var) {
     imp_frame <- imp_frame[wrapr::orderv(imp_frame[2]), ]
     imp_frame$var <- factor(imp_frame$var, levels = c(rownames(imp_frame)))
 
-    # new stuff
     m <- max(imp_frame[2])
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- round_any(newr, 10, ceiling)
+    rrr <- plyr::round_any(newr, 10, ceiling)
 
-    if(newr/rrr < 3/4){
-      rrr <- round_any(newr, 4, ceiling)
+    if (newr / rrr < 3 / 4) {
+      rrr <- plyr::round_any(newr, 4, ceiling)
     }
 
     newm <- rrr * (10^(ind - 5))
 
-    div <- ifelse(0 == (rrr / 5) %% 5, 5,
-                  ifelse(0 == (rrr / 5) %% 4, 4,
-                         ifelse(0 == (rrr / 5) %% 3, 3, 4)
-                  )
+    div <- case_when(
+      (rrr / 5) %% 5 == 0 ~ 5,
+      (rrr / 5) %% 4 == 0 ~ 4,
+      (rrr / 5) %% 3 == 0 ~ 3,
+      .default = 4
     )
-    # end
 
     imp_frame2 <- imp_frame
 
