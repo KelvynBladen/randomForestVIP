@@ -1,7 +1,6 @@
 #' Mtry Tune via VIPs
 #' @name mtry_compare
 #' @importFrom randomForest importance randomForest
-#' @importFrom ggplotify as.ggplot
 #' @importFrom dplyr %>% arrange across ends_with desc filter select
 #'   summarise group_by case_when
 #' @importFrom ggplot2 ggplot geom_point geom_line ylab ggtitle theme
