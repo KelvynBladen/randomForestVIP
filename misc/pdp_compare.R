@@ -26,7 +26,7 @@
 #' grid.arrange(car_pd$wt, car_pd$disp, car_pd$hp, car_pd$cyl, nrow = 2)
 #' @export
 
-pdp_compare <- function(x = Lo.rf, vars = c("wt", "fruit", "hp", "cyl"),
+pdp_compare <- function(x = Lo.rf, vars,
                         trim = 0.1, which.class = 2L, prob = T, ...) {
 
   data <- eval(getCall(x)$data)
@@ -41,7 +41,7 @@ pdp_compare <- function(x = Lo.rf, vars = c("wt", "fruit", "hp", "cyl"),
   pd_num <- NULL
   pd_fac <- NULL
   for (i in vvec) {
-    tmp <- partial(x, pred.var = i, which.class = which.class,
+    tmp <- pdp::partial(x, pred.var = i, which.class = which.class,
                    prob = prob)#, ...)
     names(tmp) <- c("x", "y")
 
@@ -60,7 +60,7 @@ pdp_compare <- function(x = Lo.rf, vars = c("wt", "fruit", "hp", "cyl"),
                 y[floor(length(y)*trim)+1],
               sd = sd(y),
               mad = stats::mad(y, center = mean(y))) %>%
-    arrange(desc(range))
+    arrange(desc(trim_range))
 
   # im <- as.data.frame(importance(x, scale = F))
   # im$var <- rownames(im)
@@ -226,23 +226,32 @@ li$StandAgeClass <- as.factor(li$StandAgeClass)
 li$ReserveStatus <- as.factor(li$ReserveStatus)
 
 #li = li %>% select(-StandAgeClass, -ReserveStatus)
+library(tidyverse)
+library(randomForest)
+library(pdp)
 
+set.seed(1234)
 Lo.rf <- randomForest(formula = factor(LobaOreg) ~ ., data = li,
-                      mtry = 20, importance = T)
+                      mtry = 5, importance = T)
 Lo_pd <- pdp_compare(x = Lo.rf, which.class = 2L, prob = T, trim = 0.1)
-Lo_pd$full_num
+f <- Lo_pd$imp
+f
 Lo_pd$full_num
 Lo_pd$full_fac
 Lo_pd$ACONIF
 Lo_pd$StandAgeClass
 vip = Lo_pd$imp
+vip
 pairs(vip[-1])
 cor(vip[-1])
 plot(vip$range, vip$trim_range)
 plot(vip$sd, vip$trim_range)
 order(desc(vip$trim_range))
+varImpPlot(Lo.rf, scale = F)
 vi = as.data.frame(importance(Lo.rf, scale = F))
-vi = arrange(vi, rev(MeanDecreaseAccuracy))
+vi = dplyr::arrange(vi, rev(MeanDecreaseGini))
+vi
+vi
 plot(vi$MeanDecreaseAccuracy, vip$range)
 plot(vi$MeanDecreaseGini, vip$range)
 plot(vi$MeanDecreaseAccuracy, vi$MeanDecreaseGini)

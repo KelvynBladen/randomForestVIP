@@ -25,5 +25,5 @@ VignetteBuilder: knitr
 Config/testthat/edition: 3
 Imports:
   dplyr, ggplot2, gridExtra, randomForest, tidyr, rpart, car, stats,
-  e1071, minerva, Metrics, wrapr, plyr
+  e1071, minerva, Metrics, wrapr, plyr, rmarkdown
 RoxygenNote: 7.2.3
