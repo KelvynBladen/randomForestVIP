@@ -30,7 +30,7 @@ install.packages("devtools")
 devtools::install_github("KelvynBladen/rfvip")
 ```
 
-You can view R package's source code on [GitHub](https://github.com/KelvynBladen/rfvip)
+You can view R package's source code on GitHub: <https://github.com/KelvynBladen/rfvip>
 
 ## Example
 
