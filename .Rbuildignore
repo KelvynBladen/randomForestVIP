@@ -4,3 +4,4 @@
 ^data-raw$
 ^misc$
 ^\.github$
+^README\.Rmd$
