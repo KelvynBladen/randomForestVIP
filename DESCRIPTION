@@ -27,3 +27,5 @@ Imports:
   dplyr, ggplot2, gridExtra, randomForest, tidyr, rpart, car, stats,
   e1071, minerva, Metrics, wrapr, plyr, rmarkdown, EZtune
 RoxygenNote: 7.2.3
+Depends: 
+    R (>= 2.10)
