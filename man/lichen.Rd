@@ -25,15 +25,7 @@ A data frame with 840 observations and 40 variables. One variable is
   The variables are summarized as follows:
 
   \describe{
-  \item{PlotNum}{Identifier of the section of forest from which the data
-  were collected.}
   \item{LobaOreg}{Lobaria oregana (Absent = 0, Present = 1)}
-  \item{LobaPulm}{Lobaria pulmonaria (Absent = 0, Present = 1)}
-  \item{NephBell}{Nephroma bellum (Absent = 0, Present = 1)}
-  \item{NephHelv}{Nephroma helveticum (Absent = 0, Present = 1)}
-  \item{PseuAnom}{Pseudocyphellaria anomala (Absent = 0, Present = 1)}
-  \item{PseuAnth}{Pseudocyphellaria anthraspis (Absent = 0, Present = 1)}
-  \item{PseuCroc}{Pseudocyphellaria crocata (Absent = 0, Present = 1)}
   \item{EvapoTransAve}{Average monthly potential evapotranspiration in mm}
   \item{EvapoTransDiff}{Summer-to-winter difference in monthly potential
   evapotranspiration in mm}

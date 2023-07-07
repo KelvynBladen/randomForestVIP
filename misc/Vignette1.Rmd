@@ -2,14 +2,14 @@
 title: "rfvip Vignette"
 author: "Kelvyn Bladen"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: rmarkdown::html_document
 vignette: >
   %\VignetteIndexEntry{rfvip Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -40,7 +40,7 @@ library(EZtune)
 
 We will attempt to build an optimal model for the Boston housing data. This can be found in the MASS package. To begin we will run some preliminary diagnostics on our data.
 
-```{r, warning=FALSE, message=FALSE, fig.width=4, fig.height=4}
+```{r, warning=FALSE, message=FALSE}
 set.seed(1234)
 
 pcs <- partial_cor(medv ~ ., data = Boston, model = lm)
@@ -52,7 +52,7 @@ rv$plot_nonlin_vifs
 
 These look quite good with regard to collinearity. The VIFs are all less than 10. The partial correlations with the response are a type of pseudo-importance assessing the importance each variable does not share with the others. Now we tune our model across four mtry values.
 
-```{r, warning=FALSE, message=FALSE, fig.width=4, fig.height=4}
+```{r, warning=FALSE, message=FALSE}
 set.seed(1)
 m <- mtry_compare(medv ~ ., data = Boston, sqrt = TRUE, 
                   mvec = c(1,4,9,13), num_var = 7)
@@ -62,7 +62,7 @@ m$model_errors
 
 According to the accuracy plot and table, our best choice is when mtry is 4. However, the accuracy for the best model is very similar to two of the other models. We now look at the variable importance metrics across the different models.
 
-```{r, warning=FALSE, message=FALSE, fig.width=6, fig.height=5}
+```{r, warning=FALSE, message=FALSE}
 m$gg_var_imp_error
 ```
 
@@ -70,7 +70,7 @@ The top two variables are consistently identified as more important than the oth
 
 We now take our selected model and build individual importance plots for it.
 
-```{r, warning=FALSE, message=FALSE, fig.width=4, fig.height=4}
+```{r, warning=FALSE, message=FALSE}
 g <- ggvip(m$rf9)$both_vips
 ```
 
@@ -86,7 +86,7 @@ library(rfvip)
 
 We will attempt to build an optimal model for the Lichen data. This can be found in the EZtune package. The response is presence or absence (coded 0 or 1) of a lichen species, Lobaria Oregana. To begin we will run preliminary diagnostics on our data.
 
-```{r, warning=FALSE, message=FALSE, fig.width=4, fig.height=4}
+```{r, warning=FALSE, message=FALSE}
 set.seed(1234)
 
 lichen <- EZtune::lichen[, -c(1, 3:8)]
@@ -105,7 +105,7 @@ rv$plot_nonlin_vifs
 
 These variables have large issues of collinearity. To illustrate this look at the pairs plots above for 'MinTempAve', 'Elevation', and 'AmbVapPressAve'. Most of the VIFs exceed the standard threshold. The partial correlations with the response are a type of pseudo-importance assessing the importance each variable does not share with the others. Now we tune our model across four mtry values.
 
-```{r, warning=FALSE, message=FALSE, fig.width=4, fig.height=4}
+```{r, warning=FALSE, message=FALSE}
 set.seed(100)
 m <- mtry_compare(factor(LobaOreg) ~ ., data = lichen, sqrt = TRUE, 
                   mvec = c(1,5,19,33), num_var = 7)
@@ -115,7 +115,7 @@ m$model_errors
 
 According to the accuracy plot and table, our best choice is when mtry is 19. However, the accuracy for the best model is very similar to some of the other models. We now look at the variable importance metrics across the different models.
 
-```{r, warning=FALSE, message=FALSE, fig.width=6, fig.height=5}
+```{r, warning=FALSE, message=FALSE}
 m$gg_var_imp_error
 ```
 
@@ -125,9 +125,10 @@ No solution is perfect, but mtry = 33 yields results that match the intuition ab
 
 We now take our selected model and build individual importance plots for it.
 
-```{r, warning=FALSE, message=FALSE, fig.width=6.2, fig.height=6}
+```{r, warning=FALSE, message=FALSE}
+
 g <- ggvip(m$rf33)$both_vips
-# g <- ggvip(m$rf33, num_var = 13)$both_vips
+#g <- ggvip(m$rf33, num_var = 13)$both_vips
 ```
 
 Looks fantastic. We have used variable importance and accuracy metrics to pick a solid model for prediction and with much more useful importance values.

@@ -26,13 +26,6 @@ This data frame contains the following columns:
   \item{medv}{median value of owner-occupied homes in $1000s.}
   }
 }
-\source{
-Harrison, D. and Rubinfeld, D.L. (1978) Hedonic prices and the demand for
-  clean air. J. Environ. Economics and Management 5, 81–102.
-
-  Belsley D.A., Kuh, E. and Welsch, R.E. (1980) Regression Diagnostics.
-  Identifying Influential Data and Sources of Collinearity. New York: Wiley.
-}
 \usage{
 Boston
 }

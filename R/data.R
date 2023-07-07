@@ -41,15 +41,7 @@
 #'   The variables are summarized as follows:
 #'
 #'   \describe{
-#'   \item{PlotNum}{Identifier of the section of forest from which the data
-#'   were collected.}
 #'   \item{LobaOreg}{Lobaria oregana (Absent = 0, Present = 1)}
-#'   \item{LobaPulm}{Lobaria pulmonaria (Absent = 0, Present = 1)}
-#'   \item{NephBell}{Nephroma bellum (Absent = 0, Present = 1)}
-#'   \item{NephHelv}{Nephroma helveticum (Absent = 0, Present = 1)}
-#'   \item{PseuAnom}{Pseudocyphellaria anomala (Absent = 0, Present = 1)}
-#'   \item{PseuAnth}{Pseudocyphellaria anthraspis (Absent = 0, Present = 1)}
-#'   \item{PseuCroc}{Pseudocyphellaria crocata (Absent = 0, Present = 1)}
 #'   \item{EvapoTransAve}{Average monthly potential evapotranspiration in mm}
 #'   \item{EvapoTransDiff}{Summer-to-winter difference in monthly potential
 #'   evapotranspiration in mm}
@@ -103,6 +95,7 @@
 #'   for Classification in Ecology. Ecology 88(11): 2783-2792.
 "lichen"
 
+
 #' Housing Values in Suburbs of Boston
 #'
 #' @name Boston
@@ -132,10 +125,4 @@
 #'   \item{lstat}{lower status of the population (percent).}
 #'   \item{medv}{median value of owner-occupied homes in $1000s.}
 #'   }
-#' @source
-#' Harrison, D. and Rubinfeld, D.L. (1978) Hedonic prices and the demand for
-#'   clean air. J. Environ. Economics and Management 5, 81–102.
-#'
-#'   Belsley D.A., Kuh, E. and Welsch, R.E. (1980) Regression Diagnostics.
-#'   Identifying Influential Data and Sources of Collinearity. New York: Wiley.
 "Boston"

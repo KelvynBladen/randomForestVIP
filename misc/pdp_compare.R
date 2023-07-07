@@ -204,11 +204,15 @@ house_pd$full_num
 cor(house_pd$imp[-1])
 plot(house_pd$imp[-1])
 
-house.rf1 <- randomForest(formula = medv ~ ., data = Boston,
-                          mtry = 13, importance = T)
+set.seed(123)
+library(randomForest)
+house.rf1 <- randomForest(formula = medv ~ ., data = MASS::Boston,
+                          importance = T)
+varImpPlot(house.rf1)
 house_pd1 <- pdp_compare(x = house.rf1, trim = 0.1)
 house_pd1$imp
 house_pd1$full_num
+
 
 cor(house_pd1$imp[-1])
 plot(house_pd1$imp[-1])

@@ -1,31 +1,48 @@
-Package: rfvip
 Type: Package
+Package: rfvip
 Title: Tune Random Forests Based On Variable Importance & Plot Results
 Version: 0.1.0
 Author: Kelvyn Bladen
 Maintainer: Kelvyn Bladen <kelvyn.bladen@usu.edu>
-Description: This package contains functions for assessing variable relations 
-    and associations prior to modeling with a Random Forest algorithm (although 
-    these are relevant for any predictive model). Metrics such as partial 
-    correlations and variance inflation factors are tabulated as well as 
-    plotted for the user. A function is available for tuning the hyper-parameter 
-    mtry based on model performance and variable importance metrics. This 
-    grid-search technique provides tables and plots showing the effect of 
-    mtry on each of the assessment metrics. It also returns each of the 
-    evaluated models to the user. The package also provides superior ggplot2 
-    variable importance plots for singular models. All of the plots are 
-    developed with ggplot2 techniques so that the user has the ability to 
-    edit and improve further upon the plots.
+Description: This package contains functions for assessing variable
+    relations and associations prior to modeling with a Random Forest
+    algorithm (although these are relevant for any predictive model).
+    Metrics such as partial correlations and variance inflation factors
+    are tabulated as well as plotted for the user. A function is available
+    for tuning the hyper-parameter mtry based on model performance and
+    variable importance metrics. This grid-search technique provides
+    tables and plots showing the effect of mtry on each of the assessment
+    metrics. It also returns each of the evaluated models to the user. The
+    package also provides superior ggplot2 variable importance plots for
+    singular models. All of the plots are developed with ggplot2
+    techniques so that the user has the ability to edit and improve
+    further upon the plots.
 License: GPL-3 + file LICENSE
-Encoding: UTF-8
-LazyData: true
-Suggests: 
-    testthat (>= 3.0.0), knitr
-VignetteBuilder: knitr
-Config/testthat/edition: 3
-Imports:
-  dplyr, ggplot2, gridExtra, randomForest, tidyr, rpart, car, stats,
-  e1071, minerva, Metrics, wrapr, plyr, rmarkdown, EZtune
-RoxygenNote: 7.2.3
 Depends: 
     R (>= 2.10)
+Imports:
+    car,
+    dplyr,
+    e1071,
+    ggplot2,
+    gridExtra,
+    Metrics,
+    minerva,
+    plyr,
+    randomForest,
+    rpart,
+    stats,
+    tidyr,
+    wrapr
+Suggests: 
+    EZtune,
+    knitr,
+    MASS,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: 
+    knitr
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
