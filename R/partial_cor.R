@@ -1,13 +1,10 @@
 #' Partial Correlations
 #' @name partial_cor
 #' @importFrom randomForest randomForest
-#' @importFrom rpart rpart
 #' @importFrom stats lm model.frame cor model.matrix predict
-#' @importFrom e1071 svm
 #' @importFrom ggplot2 ggplot aes geom_point xlim ylim geom_line ggtitle
 #' @importFrom dplyr %>% arrange desc
 #' @importFrom minerva mine
-#' @importFrom wrapr orderv
 #' @description A list of data.frames and useful plots for user evaluations of
 #'   correlations and partial correlations of predictors with a given response.
 #' @param formula an object of class "\link{formula}" (or one that can be
@@ -78,7 +75,7 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
 
     cd$cor <- cor(mf)[-1, 1]
 
-    cd <- cd[wrapr::orderv(abs(cd[2])), ]
+    cd <- cd[do.call(base::order, as.list(abs(cd[2]))), ]
     cd$var <- factor(cd$var, levels = cd$var)
 
     if (!missing(num_var)) {
@@ -117,7 +114,7 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
 
     cdf$part_cor <- ifelse(is.na(cdf$part_cor), 0, cdf$part_cor)
 
-    cdf <- cdf[wrapr::orderv(abs(cdf[2])), ]
+    cdf <- cdf[do.call(base::order, as.list(abs(cdf[2]))), ]
     cdf$var <- factor(cdf$var, levels = c(cdf$var))
 
     if (!missing(num_var)) {
@@ -145,7 +142,7 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
     l$y_partial_cors <- cdf
   }
 
-  mdf <- mdf[wrapr::orderv(mdf[2]), ]
+  mdf <- mdf[do.call(base::order, as.list(mdf[2])), ]
   mdf$var <- factor(mdf$var, levels = mdf$var)
 
   if (!missing(num_var)) {
@@ -164,7 +161,7 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
     xlim(0, 1) +
     ggtitle("Mutual Information Between Predictor Variables and Response")
 
-  mdf <- mdf[wrapr::orderv(mdf[3]), ]
+  mdf <- mdf[do.call(base::order, as.list(mdf[3])), ]
   mdf$var <- factor(mdf$var, levels = mdf$var)
 
   if (!missing(num_var)) {
@@ -186,7 +183,7 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
     ) +
     ggtitle("URF Accuracy Mutual Information")
 
-  mdf <- mdf[wrapr::orderv(mdf[4]), ]
+  mdf <- mdf[do.call(base::order, as.list(mdf[4])), ]
   mdf$var <- factor(mdf$var, levels = mdf$var)
 
   if (!missing(num_var)) {

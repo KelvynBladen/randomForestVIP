@@ -9,7 +9,6 @@
 #' @importFrom stats model.frame getCall
 #' @importFrom pdp partial
 #' @importFrom tidyr all_of
-#' @importFrom plyr round_any
 #' @description A list of partial dependence plots, and pdp importance values for
 #'   assessing true affect of predictors on response.
 #' @param x An object of class randomForest.
@@ -77,19 +76,19 @@ pdp_compare <- function(x = Lo.rf, vars,
 
   indu <- findInterval(abs(u), v)
   newu <- u / (10^(indu - 6))
-  ru <- plyr::round_any(newu, 10, ceiling)
+  ru <- ceiling(newu/10)*10
 
   indl <- findInterval(abs(l), v)
   newl <- l / (10^(indl - 6))
-  rl <- plyr::round_any(newl, 10, floor)
+  rl <- floor(newl/10)*10
 
   nu <- ru * (10^(indu - 6))
   nl <- rl * (10^(indl - 6))
   nrr <- nu - nl
 
   if(rr/nrr < 3/4 | nl/l < 3/4 | u/nu < 3/4){
-    ru <- plyr::round_any(newu, 4, ceiling)
-    rl <- plyr::round_any(newl, 4, floor)
+    ru <- ceiling(newu/4)*4
+    rl <- floor(newl/4)*4
     nu <- ru * (10^(indl - 6))
     nl <- rl * (10^(indl - 6))
     nrr <- nu - nl

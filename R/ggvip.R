@@ -5,8 +5,6 @@
 #' @importFrom ggplot2 ggplot geom_point xlim xlab ylab ggtitle theme
 #'   aes_string element_text
 #' @importFrom gridExtra grid.arrange
-#' @importFrom wrapr orderv
-#' @importFrom plyr round_any
 #' @description A ggplot of variable importance as measured by a Random Forest.
 #' @param x An object of class randomForest.
 #' @param scale For permutation based measures such as MSE or Accuracy, should
@@ -61,7 +59,7 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
   }
 
   if (length(colnames(imp_frame)) == 2) {
-    imp_frame <- imp_frame[wrapr::orderv(imp_frame[1]), ]
+    imp_frame <- imp_frame[do.call(base::order, as.list(imp_frame[1])), ]
     imp_frame$var <- factor(imp_frame$var, levels = c(rownames(imp_frame)))
 
     m <- max(imp_frame[1])
@@ -69,10 +67,10 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- plyr::round_any(newr, 10, ceiling)
+    rrr <- ceiling(newr / 10)*10
 
     if (newr / rrr < 3 / 4) {
-      rrr <- plyr::round_any(newr, 4, ceiling)
+      rrr <- ceiling(newr / 4)*4
     }
 
     newm <- rrr * (10^(ind - 5))
@@ -106,7 +104,7 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     l$table <- imp_frame
     l
   } else {
-    imp_frame <- imp_frame[wrapr::orderv(imp_frame[1]), ]
+    imp_frame <- imp_frame[do.call(base::order, as.list(imp_frame[1])), ]
     imp_frame$var <- factor(imp_frame$var, levels = c(rownames(imp_frame)))
 
     if (colnames(imp_frame)[1] == "%IncMSE") {
@@ -118,10 +116,10 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- plyr::round_any(newr, 10, ceiling)
+    rrr <- ceiling(newr/10)*10
 
     if (newr / rrr < 3 / 4) {
-      rrr <- plyr::round_any(newr, 4, ceiling)
+      rrr <- ceiling(newr/4)*4
     }
 
     newm <- rrr * (10^(ind - 5))
@@ -135,7 +133,8 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
 
     imp_frame1 <- imp_frame
 
-    imp_frame1 <- imp_frame1[rev(wrapr::orderv(imp_frame1[1])), ]
+    imp_frame1 <- imp_frame1[rev(do.call(base::order,
+                                         as.list(imp_frame1[1]))), ]
 
     g1 <- imp_frame %>%
       ggplot(aes_string(
@@ -152,17 +151,17 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
         paste0("sqrt(", colnames(imp_frame)[1], ")")
       ))
 
-    imp_frame <- imp_frame[wrapr::orderv(imp_frame[2]), ]
+    imp_frame <- imp_frame[do.call(base::order, as.list(imp_frame[2])), ]
     imp_frame$var <- factor(imp_frame$var, levels = c(rownames(imp_frame)))
 
     m <- max(imp_frame[2])
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- plyr::round_any(newr, 10, ceiling)
+    rrr <- ceiling(newr/10)*10
 
     if (newr / rrr < 3 / 4) {
-      rrr <- plyr::round_any(newr, 4, ceiling)
+      rrr <- ceiling(newr/4)*4
     }
 
     newm <- rrr * (10^(ind - 5))
@@ -176,7 +175,8 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
 
     imp_frame2 <- imp_frame
 
-    imp_frame2 <- imp_frame2[rev(wrapr::orderv(imp_frame2[2])), ]
+    imp_frame2 <- imp_frame2[rev(do.call(base::order,
+                                         as.list(imp_frame2[2]))), ]
 
     g2 <- imp_frame %>%
       ggplot(aes_string(

@@ -23,22 +23,19 @@ Depends:
 Imports:
     car,
     dplyr,
-    e1071,
     ggplot2,
     gridExtra,
-    Metrics,
     minerva,
-    plyr,
     randomForest,
-    rpart,
     stats,
-    tidyr,
-    wrapr
+    tidyr
 Suggests: 
     EZtune,
+    e1071,
     knitr,
     MASS,
     rmarkdown,
+    rpart,
     testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr

@@ -1,13 +1,9 @@
 #' Non-linear Variance Inflation Factors
 #' @name robust_vifs
-#' @importFrom rpart rpart
 #' @importFrom stats lm model.frame
 #' @importFrom ggplot2 ggplot geom_point xlim ylim geom_line ggtitle geom_vline
 #' @importFrom dplyr %>% arrange desc
 #' @importFrom car vif
-#' @importFrom Metrics sse
-#' @importFrom e1071 svm
-#' @importFrom wrapr orderv
 #' @description A list of data.frames and useful plots for user evaluations of
 #'   the randomForest hyperparameter mtry.
 #' @param formula an object of class "\link{formula}" (or one that can be
@@ -74,8 +70,8 @@ robust_vifs <- function(formula, data, model = randomForest,
 
     # Consider Fixes that use a test or OOB or CV error rather than
     # training Error.
-    r2 <- 1 - (Metrics::sse(as.numeric(mf[, k]), predict(r, mf[, -c(1, k)])) /
-      Metrics::sse(as.numeric(mf[, k]), mean(as.numeric(mf[, k]))))
+    r2 <- 1 - (sum((as.numeric(mf[, k]) - predict(r, mf[, -c(1, k)])) ^ 2) /
+               sum((as.numeric(mf[, k]) - mean(as.numeric(mf[, k])))))
     vdf[k - 1, 4] <- 1 / (1 - r2)
     vdf[k - 1, 5] <- r2
   }
@@ -86,7 +82,7 @@ robust_vifs <- function(formula, data, model = randomForest,
     colnames(vdf)[c(2, 4)] <- c("Log10_lm_vif", "Log10_model_vif")
   }
 
-  vdf <- vdf[wrapr::orderv(vdf[2]), ]
+  vdf <- vdf[do.call(base::order, as.list(vdf[2])), ]
   vdf$var <- factor(vdf$var, levels = vdf$var)
 
   if (!missing(num_var)) {
@@ -120,7 +116,7 @@ robust_vifs <- function(formula, data, model = randomForest,
     ggtitle("Linear R2 for Modeling each Predictor on all Others") +
     geom_vline(xintercept = 0.9, color = "blue")
 
-  vdf <- vdf[wrapr::orderv(vdf[4]), ]
+  vdf <- vdf[do.call(base::order, as.list(vdf[4])), ]
   vdf$var <- factor(vdf$var, levels = vdf$var)
 
   if (!missing(num_var)) {

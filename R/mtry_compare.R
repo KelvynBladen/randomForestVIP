@@ -171,9 +171,9 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   ind <- findInterval(m, v)
 
   newr <- m / (10^(ind - 5))
-  rrr <- plyr::round_any(newr, 10, ceiling)
+  rrr <- ceiling(newr/10)*10
 
-  rrr <- ifelse(newr / rrr < 3 / 4, plyr::round_any(newr, 4, ceiling), rrr)
+  rrr <- ifelse(newr / rrr < 3 / 4, ceiling(newr/4)*4, rrr)
 
   newm <- rrr * (10^(ind - 5))
 
@@ -204,9 +204,9 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   ind <- findInterval(m, v)
 
   newr <- m / (10^(ind - 5))
-  rrr <- plyr::round_any(newr, 10, ceiling)
+  rrr <- ceiling(newr/10)*10
 
-  rrr <- ifelse(newr / rrr < 3 / 4, plyr::round_any(newr, 4, ceiling), rrr)
+  rrr <- ifelse(newr / rrr < 3 / 4, ceiling(newr/4)*4, rrr)
 
   newm <- rrr * (10^(ind - 5))
 
@@ -237,9 +237,9 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   ind <- findInterval(m, v)
 
   newr <- m / (10^(ind - 5))
-  rrr <- plyr::round_any(newr, 10, ceiling)
+  rrr <- ceiling(newr/10)*10
 
-  rrr <- ifelse(newr / rrr < 3 / 4, plyr::round_any(newr, 4, ceiling), rrr)
+  rrr <- ifelse(newr / rrr < 3 / 4, ceiling(newr/4)*4, rrr)
 
   newm <- rrr * (10^(ind - 5))
 

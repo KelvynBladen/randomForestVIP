@@ -1,12 +1,8 @@
 #' Mtry Tune via VIPs
 #' @name caret_plot
-#' @importFrom dplyr %>% arrange across ends_with desc filter select
-#'   summarise group_by case_when
+#' @importFrom dplyr %>% select summarise group_by case_when
 #' @importFrom ggplot2 ggplot geom_point geom_line ylab ggtitle theme
 #'   aes_string scale_x_continuous scale_y_continuous
-#' @importFrom gridExtra arrangeGrob
-#' @importFrom tidyr pivot_wider
-#' @importFrom stats model.frame na.omit quantile
 #' @description A list of data.frames and useful plots for comparing the
 #'   performance of models across their hyper-parameters.
 #' @param x An object of class train.
@@ -82,9 +78,9 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- plyr::round_any(newr, 10, ceiling)
+    rrr <- ceiling(newr/10)*10
 
-    rrr <- ifelse(newr / rrr < .75, plyr::round_any(newr, 4, ceiling), rrr)
+    rrr <- ifelse(newr / rrr < .75, ceiling(newr/4)*4, rrr)
 
     newm <- rrr * (10^(ind - 5))
     div <- case_when(
@@ -220,9 +216,9 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
         ind <- findInterval(m, v)
 
         newr <- m / (10^(ind - 5))
-        rrr <- plyr::round_any(newr, 10, ceiling)
+        rrr <- ceiling(newr/10)*10
 
-        rrr <- ifelse(newr / rrr < .75, plyr::round_any(newr, 4, ceiling), rrr)
+        rrr <- ifelse(newr / rrr < .75, ceiling(newr/4)*4, rrr)
 
         newm <- rrr * (10^(ind - 5))
         div <- ifelse(0 == (rrr / 5) %% 5, 5,
