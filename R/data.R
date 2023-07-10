@@ -93,6 +93,8 @@
 #' Cutler, D. Richard., Thomas C. Edwards Jr., Karen H. Beard, Adele Cutler,
 #'   Kyle T. Hess, Jacob Gibson, and Joshua J. Lawler. 2007. Random Forests
 #'   for Classification in Ecology. Ecology 88(11): 2783-2792.
+#'
+#'   https://CRAN.R-project.org/package=EZtune
 "lichen"
 
 
@@ -125,4 +127,7 @@
 #'   \item{lstat}{lower status of the population (percent).}
 #'   \item{medv}{median value of owner-occupied homes in $1000s.}
 #'   }
+#'
+#' @source
+#' https://www.stats.ox.ac.uk/pub/MASS4/
 "Boston"

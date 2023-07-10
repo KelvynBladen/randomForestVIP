@@ -14,10 +14,12 @@ Description: This package contains functions for assessing variable
     tables and plots showing the effect of mtry on each of the assessment
     metrics. It also returns each of the evaluated models to the user. The
     package also provides superior ggplot2 variable importance plots for
-    singular models. All of the plots are developed with ggplot2
-    techniques so that the user has the ability to edit and improve
-    further upon the plots.
+    singular models. All of the plots are developed with ggplot2 techniques 
+    so that the user has the ability to edit and improve further upon the 
+    plots. Derivations and methodology are described in Bladen (2022) 
+    <https://digitalcommons.usu.edu/etd/8587>.
 License: GPL-3 + file LICENSE
+URL: https://github.com/KelvynBladen/rfvip
 Depends: 
     R (>= 4.0.0)
 Imports:

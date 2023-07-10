@@ -1,7 +1,11 @@
 ## Test environments
-* local R installation, R 4.0.4
-* ubuntu 16.04 (on travis-ci), R 4.0.4
-* win-builder (devel)
+* local R installation, R 4.2.1
+* macos-latest (release)
+* windows-latest (release)
+* ubuntu-latest (devel)
+* ubuntu-latest (release)
+* ubuntu-latest (oldrel-1)
+
 
 ## R CMD check results
 
