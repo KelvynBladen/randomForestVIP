@@ -191,7 +191,6 @@ using `ggvip`.
 
 ```{r, warning=FALSE, message=FALSE, fig.width=6.2, fig.height=6, fig.align='center'}
 g <- ggvip(m$rf33)$both_vips
-# g <- ggvip(m$rf33, num_var = 13)$both_vips
 ```
 
 We have used the `rfvip` package to tune a strong model for prediction and with 

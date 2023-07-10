@@ -5,3 +5,4 @@
 ^misc$
 ^\.github$
 ^README\.Rmd$
+^revdep$
