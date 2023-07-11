@@ -44,7 +44,7 @@ techniques so that the user has the ability to edit and improve further upon
 the plots.
 
 For methodology see "Contributions to Random Forest Variable Importance with 
-Applications in R" <https://digitalcommons.usu.edu/etd/8587>.
+Applications in R" <https://digitalcommons.usu.edu/etd/8587/>.
 
 ## Example: Boston
 
@@ -77,8 +77,10 @@ assessing four different mtry values in the `mtry_compare` function.
 
 ```{r, warning=FALSE, message=FALSE, fig.width=4, fig.height=4, fig.align='center'}
 set.seed(1)
-m <- mtry_compare(medv ~ ., data = Boston, sqrt = TRUE, 
-                  mvec = c(1,4,9,13), num_var = 7)
+m <- mtry_compare(medv ~ .,
+  data = Boston, sqrt = TRUE,
+  mvec = c(1, 4, 9, 13), num_var = 7
+)
 m$gg_model_errors
 m$model_errors
 ```
@@ -136,12 +138,16 @@ lichen <- EZtune::lichen[, -c(1, 3:8)]
 pairs(lichen[, c(16, 20, 26)])
 cor(lichen[, c(16, 20, 26)])
 
-pcs <- partial_cor(factor(LobaOreg) ~ ., data = lichen, model = lm, 
-                   num_var = 15)
+pcs <- partial_cor(factor(LobaOreg) ~ .,
+  data = lichen, model = lm,
+  num_var = 15
+)
 pcs$plot_y_part_cors
 
-rv <- robust_vifs(factor(LobaOreg) ~ ., data = lichen, model = lm, 
-                  num_var = 15)
+rv <- robust_vifs(factor(LobaOreg) ~ .,
+  data = lichen, model = lm,
+  num_var = 15
+)
 rv$plot_nonlin_vifs
 ```
 
@@ -154,8 +160,10 @@ the others. Now we tune our Random Forest model across four mtry values.
 
 ```{r, warning=FALSE, message=FALSE, fig.width=4, fig.height=4, fig.align='center'}
 set.seed(100)
-m <- mtry_compare(factor(LobaOreg) ~ ., data = lichen, sqrt = TRUE, 
-                  mvec = c(1,5,19,33), num_var = 7)
+m <- mtry_compare(factor(LobaOreg) ~ .,
+  data = lichen, sqrt = TRUE,
+  mvec = c(1, 5, 19, 33), num_var = 7
+)
 m$gg_model_errors
 m$model_errors
 ```

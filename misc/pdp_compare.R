@@ -35,6 +35,17 @@ pdp_compare <- function(x = Lo.rf, vars,
     model_frame <- model_frame %>% select(all_of(vars))
   }
 
+  if(inherits(x, "randomForest")){
+    im <- as.data.frame(importance(x, scale = F))
+    im$var <- rownames(im)
+    im <- im[(length(im)-2):length(im)]
+  }
+
+  # if(inherits(x,"gbm")){
+  #   n.trees = x$n.trees
+  #   im = gbm::relative.influence(x)
+  # }
+
   vvec <- colnames(model_frame)
 
   pd_num <- NULL
@@ -61,10 +72,9 @@ pdp_compare <- function(x = Lo.rf, vars,
               mad = stats::mad(y, center = mean(y))) %>%
     arrange(desc(trim_range))
 
-  # im <- as.data.frame(importance(x, scale = F))
-  # im$var <- rownames(im)
-  # im <- im[(length(im)-2):length(im)]
-  # imp1 <- left_join(imp, im, by = c("var" = "var"))
+  if(exists("im")){
+    imp <- dplyr::left_join(imp, im, by = c("var" = "var"))
+  }
 
   vvec <- unique(imp$var)
 

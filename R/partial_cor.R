@@ -225,9 +225,3 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
 
   l
 }
-
-# library(minerva); library(infotheo); library(entropy); library(rmi)
-# iris1 <- iris %>% filter(Species != "setosa")
-# p <- partial_cor(formula = Petal.Length ~ ., data = iris1, model = lm)
-# p1 <- partial_cor(formula = iris$Petal.Length ~ iris$Sepal.Width +
-#   iris$Sepal.Length + iris$Petal.Width)

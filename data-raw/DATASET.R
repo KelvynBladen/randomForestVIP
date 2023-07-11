@@ -7,5 +7,5 @@ usethis::use_data(lichen, overwrite = TRUE)
 
 ## code to prepare `Boston` dataset goes here
 
-Boston <- MASS::Boston
-usethis::use_data(Boston, overwrite = TRUE)
+boston <- MASS::Boston
+usethis::use_data(boston, overwrite = TRUE)

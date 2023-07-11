@@ -171,9 +171,9 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   ind <- findInterval(m, v)
 
   newr <- m / (10^(ind - 5))
-  rrr <- ceiling(newr/10)*10
+  rrr <- ceiling(newr / 10) * 10
 
-  rrr <- ifelse(newr / rrr < 3 / 4, ceiling(newr/4)*4, rrr)
+  rrr <- ifelse(newr / rrr < 3 / 4, ceiling(newr / 4) * 4, rrr)
 
   newm <- rrr * (10^(ind - 5))
 
@@ -204,9 +204,9 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   ind <- findInterval(m, v)
 
   newr <- m / (10^(ind - 5))
-  rrr <- ceiling(newr/10)*10
+  rrr <- ceiling(newr / 10) * 10
 
-  rrr <- ifelse(newr / rrr < 3 / 4, ceiling(newr/4)*4, rrr)
+  rrr <- ifelse(newr / rrr < 3 / 4, ceiling(newr / 4) * 4, rrr)
 
   newm <- rrr * (10^(ind - 5))
 
@@ -237,9 +237,9 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   ind <- findInterval(m, v)
 
   newr <- m / (10^(ind - 5))
-  rrr <- ceiling(newr/10)*10
+  rrr <- ceiling(newr / 10) * 10
 
-  rrr <- ifelse(newr / rrr < 3 / 4, ceiling(newr/4)*4, rrr)
+  rrr <- ifelse(newr / rrr < 3 / 4, ceiling(newr / 4) * 4, rrr)
 
   newm <- rrr * (10^(ind - 5))
 
@@ -281,9 +281,3 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
 
   l
 }
-
-# library(rfvip)
-# m <- mtry_compare(formula = medv ~ ., data = Boston, num_var = 7,
-#                   mvec = c(-1.2, 3, 4, 5, 7, 9, 11.2, 13.3), sqrt = T)
-# m <- mtry_compare(formula = medv ~ ., data = Boston, sqrt = F)
-# m <- mtry_compare(formula = factor(Species) ~ ., data = iris, sqrt = TRUE)

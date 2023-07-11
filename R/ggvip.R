@@ -15,8 +15,8 @@
 #'   (1=mean decrease in accuracy or % increase in MSE, 2 = mean decrease in
 #'   node impurity or mean decrease in gini). Default is "both".
 #' @param num_var Optional argument for reducing the number of variables to the
-#'   top 'num_var'. Must be an integer between 1 and the total number of predictor
-#'   variables in the model.
+#'   top 'num_var'. Must be an integer between 1 and the total number of
+#'   predictor variables in the model.
 #' @return A ggplot dotchart showing the importance of the variables that were
 #'   plotted.
 #' @examples
@@ -52,7 +52,7 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     d <- imp_frame %>%
       arrange(desc(get(colnames(imp_frame)[1]))) %>%
       filter(get(colnames(imp_frame)[1]) >=
-               get(colnames(imp_frame)[1])[num_var])
+        get(colnames(imp_frame)[1])[num_var])
 
     imp_frame <- imp_frame %>%
       filter(var %in% d$var)
@@ -67,10 +67,10 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- ceiling(newr / 10)*10
+    rrr <- ceiling(newr / 10) * 10
 
     if (newr / rrr < 3 / 4) {
-      rrr <- ceiling(newr / 4)*4
+      rrr <- ceiling(newr / 4) * 4
     }
 
     newm <- rrr * (10^(ind - 5))
@@ -116,10 +116,10 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- ceiling(newr/10)*10
+    rrr <- ceiling(newr / 10) * 10
 
     if (newr / rrr < 3 / 4) {
-      rrr <- ceiling(newr/4)*4
+      rrr <- ceiling(newr / 4) * 4
     }
 
     newm <- rrr * (10^(ind - 5))
@@ -133,8 +133,10 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
 
     imp_frame1 <- imp_frame
 
-    imp_frame1 <- imp_frame1[rev(do.call(base::order,
-                                         as.list(imp_frame1[1]))), ]
+    imp_frame1 <- imp_frame1[rev(do.call(
+      base::order,
+      as.list(imp_frame1[1])
+    )), ]
 
     g1 <- imp_frame %>%
       ggplot(aes_string(
@@ -158,10 +160,10 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     ind <- findInterval(m, v)
 
     newr <- m / (10^(ind - 5))
-    rrr <- ceiling(newr/10)*10
+    rrr <- ceiling(newr / 10) * 10
 
     if (newr / rrr < 3 / 4) {
-      rrr <- ceiling(newr/4)*4
+      rrr <- ceiling(newr / 4) * 4
     }
 
     newm <- rrr * (10^(ind - 5))
@@ -175,8 +177,10 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
 
     imp_frame2 <- imp_frame
 
-    imp_frame2 <- imp_frame2[rev(do.call(base::order,
-                                         as.list(imp_frame2[2]))), ]
+    imp_frame2 <- imp_frame2[rev(do.call(
+      base::order,
+      as.list(imp_frame2[2])
+    )), ]
 
     g2 <- imp_frame %>%
       ggplot(aes_string(

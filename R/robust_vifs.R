@@ -70,8 +70,8 @@ robust_vifs <- function(formula, data, model = randomForest,
 
     # Consider Fixes that use a test or OOB or CV error rather than
     # training Error.
-    r2 <- 1 - (sum((as.numeric(mf[, k]) - predict(r, mf[, -c(1, k)])) ^ 2) /
-               sum((as.numeric(mf[, k]) - mean(as.numeric(mf[, k])))))
+    r2 <- 1 - (sum((as.numeric(mf[, k]) - predict(r, mf[, -c(1, k)]))^2) /
+      sum((as.numeric(mf[, k]) - mean(as.numeric(mf[, k])))))
     vdf[k - 1, 4] <- 1 / (1 - r2)
     vdf[k - 1, 5] <- r2
   }
@@ -166,8 +166,3 @@ robust_vifs <- function(formula, data, model = randomForest,
 
   l
 }
-
-# library(car); library(MASS); library(rpart)
-# robust_vifs(formula = Petal.Length ~ ., data = iris[1:4],
-#             model = randomForest)
-# robust_vifs(medv ~ ., data = Boston)

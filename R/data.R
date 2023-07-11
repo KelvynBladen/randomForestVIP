@@ -94,18 +94,18 @@
 #'   Kyle T. Hess, Jacob Gibson, and Joshua J. Lawler. 2007. Random Forests
 #'   for Classification in Ecology. Ecology 88(11): 2783-2792.
 #'
-#'   https://CRAN.R-project.org/package=EZtune
+#'   https://CRAN.R-project.org/package=EZtune/
 "lichen"
 
 
 #' Housing Values in Suburbs of Boston
 #'
-#' @name Boston
-#' @keywords Boston
+#' @name boston
+#' @keywords boston
 #' @docType data
 #' @description
 #' The Boston data frame has 506 rows and 14 columns.
-#' @usage Boston
+#' @usage boston
 #' @format
 #' This data frame contains the following columns:
 #'
@@ -122,12 +122,12 @@
 #'   \item{rad}{index of accessibility to radial highways.}
 #'   \item{tax}{full-value property-tax rate per $10,000.}
 #'   \item{ptratio}{pupil-teacher ratio by town.}
-#'   \item{black}{\eqn{1000(Bk−0.63)^2} where \eqn{Bk} is the proportion of
-#'   blacks by town.}
+#'   \item{black}{\eqn{1000(Bk-0.63)^2} where \eqn{Bk} is the
+#'   proportion of blacks by town.}
 #'   \item{lstat}{lower status of the population (percent).}
 #'   \item{medv}{median value of owner-occupied homes in $1000s.}
 #'   }
 #'
 #' @source
 #' https://www.stats.ox.ac.uk/pub/MASS4/
-"Boston"
+"boston"

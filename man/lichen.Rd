@@ -79,7 +79,7 @@ Cutler, D. Richard., Thomas C. Edwards Jr., Karen H. Beard, Adele Cutler,
   Kyle T. Hess, Jacob Gibson, and Joshua J. Lawler. 2007. Random Forests
   for Classification in Ecology. Ecology 88(11): 2783-2792.
 
-  https://CRAN.R-project.org/package=EZtune
+  https://CRAN.R-project.org/package=EZtune/
 }
 \usage{
 lichen

@@ -20,8 +20,8 @@ adjusted via a square root transformation. Default is True.}
 node impurity or mean decrease in gini). Default is "both".}
 
 \item{num_var}{Optional argument for reducing the number of variables to the
-top 'num_var'. Must be an integer between 1 and the total number of predictor
-variables in the model.}
+top 'num_var'. Must be an integer between 1 and the total number of
+predictor variables in the model.}
 }
 \value{
 A ggplot dotchart showing the importance of the variables that were
