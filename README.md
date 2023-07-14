@@ -62,33 +62,35 @@ You can view R package’s source code on GitHub:
 
 ``` r
 library(rfvip)
+library(MASS)
+library(EZtune)
 ```
 
-To introduce the functionality of `rfvip`, we will look at a modeling
-problem for the Boston housing data (found in the MASS package). We will
-attempt to build an optimal Random Forest model for accuracy and
-interpretability. To begin we will run some preliminary diagnostics on
+To introduce the functionality of `rfvip`, we look at modeling the
+Boston housing data (found in the MASS package). We want to build a
+Random Forest model with a view towards both accuracy and
+interpretability. We begin by running some preliminary diagnostics on
 our data.
 
 ``` r
 set.seed(1234)
 
-pcs <- partial_cor(medv ~ ., data = MASS::Boston, model = lm)
+pcs <- partial_cor(medv ~ ., data = Boston, model = lm)
 pcs$plot_y_part_cors
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" />
 
 ``` r
 
-rv <- robust_vifs(medv ~ ., data = MASS::Boston, model = lm)
+rv <- robust_vifs(medv ~ ., data = Boston, model = lm)
 rv$plot_nonlin_vifs
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-2.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-3-2.png" width="100%" style="display: block; margin: auto;" />
 
 These functions assess concerns with collinearity. Notice that the VIFs
-from `robust_vifs`are all less than 10. The partial correlations with
+from `robust_vifs` are all less than 10. The partial correlations with
 the response from `partial_cor` are a type of pseudo-importance
 assessing the importance each variable does not share with the others.
 Now we tune our model by assessing four different mtry values in the
@@ -97,13 +99,13 @@ Now we tune our model by assessing four different mtry values in the
 ``` r
 set.seed(1)
 m <- mtry_compare(medv ~ .,
-  data = MASS::Boston, sqrt = TRUE,
+  data = Boston, sqrt = TRUE,
   mvec = c(1, 4, 9, 13), num_var = 7
 )
 m$gg_model_errors
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" />
 
 ``` r
 m$model_errors
@@ -115,26 +117,27 @@ m$model_errors
 ```
 
 According to the accuracy plot and table above, our best choice is when
-mtry is 4. However, the accuracy for the best model is notably very
-similar to two of the other models. We now look at the variable
-importance metrics across the different models.
+mtry is 4. However, the accuracy for the best model is notably only
+slightly better than the models with mtry set to 9 and 13. We now look
+at the variable importance metrics across the different models.
 
 ``` r
 m$gg_var_imp_error
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" />
 
 The top two variables are consistently identified as more important than
 the other variables and their order remains unchanged across mtry.
 However, the variables ‘nox’ and ‘dis’ switch order as mtry increases.
-Common sense suggests that pollution (nox) is correlated with distance
-to employment centers (dis). Our common sense leads us to assume that
-most home buyers consider distance to work more than pollution when
-selecting a house. Therefore, ‘dis’ is likely a more causal driver of
-price than ‘nox’. Consequently, the model where mtry is 9 appears to be
-superior to the model where mtry is 4, despite mtry of 4 yielding
-slightly more accurate results.
+Pollution (nox) has a strong negative correlation with distance to
+employment centers (dis). This makes sense if the employment centers are
+responsible for much of the pollution. If many home buyers consider
+distance to work more important than pollution when selecting a house,
+‘dis’ is more likely to be a causal driver of price than ‘nox’. By this
+reasoning, the model where mtry is 9 appears to be superior to the model
+where mtry is 4, despite mtry of 4 yielding slightly more accurate
+results.
 
 We now take our selected model and build individual importance plots for
 it using `ggvip`.
@@ -143,7 +146,7 @@ it using `ggvip`.
 g <- ggvip(m$rf9)$both_vips
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" />
 
 The plot above resembles a standard variable importance plot, but
 possesses superior tick labels and editing capabilities for the analyst.

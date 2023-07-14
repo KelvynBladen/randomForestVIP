@@ -41,18 +41,22 @@ pdp_compare <- function(x = Lo.rf, vars,
     im <- im[(length(im)-2):length(im)]
   }
 
-  # if(inherits(x,"gbm")){
-  #   n.trees = x$n.trees
-  #   im = gbm::relative.influence(x)
-  # }
+  if(inherits(x,"gbm")){
+    im = as.data.frame(gbm::relative.influence(x))
+    colnames(im) = "importance"
+    im$var = rownames(im)
+  }
 
   vvec <- colnames(model_frame)
 
   pd_num <- NULL
   pd_fac <- NULL
   for (i in vvec) {
-    tmp <- pdp::partial(x, pred.var = i, which.class = which.class,
-                   prob = prob)#, ...)
+    ifelse(inherits(x,"gbm"),
+      tmp <- pdp::partial(x, pred.var = i, which.class = which.class,
+                          prob = prob, n.trees = x$n.trees),
+      tmp <- pdp::partial(x, pred.var = i, which.class = which.class,
+                          prob = prob))#, ...)
     names(tmp) <- c("x", "y")
 
     if(inherits(tmp$x, "numeric")){
@@ -70,7 +74,7 @@ pdp_compare <- function(x = Lo.rf, vars,
                 y[floor(length(y)*trim)+1],
               sd = sd(y),
               mad = stats::mad(y, center = mean(y))) %>%
-    arrange(desc(trim_range))
+    arrange(desc(trim_range), desc(sd))
 
   if(exists("im")){
     imp <- dplyr::left_join(imp, im, by = c("var" = "var"))
@@ -197,6 +201,7 @@ mtcars.rf <- randomForest(formula = mpg ~ ., data = mtcars)
 # p <- partial(mtcars.rf, pred.var = c("drat"))
 # plotPartial(p)
 car_pd <- pdp_compare(x = mtcars.rf)
+car_pd$imp
 car_pd$full
 car_pd$drat
 car_pd$cyl
