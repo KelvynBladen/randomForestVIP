@@ -71,7 +71,7 @@ robust_vifs <- function(formula, data, model = randomForest,
     # Consider Fixes that use a test or OOB or CV error rather than
     # training Error.
     r2 <- 1 - (sum((as.numeric(mf[, k]) - predict(r, mf[, -c(1, k)]))^2) /
-      sum((as.numeric(mf[, k]) - mean(as.numeric(mf[, k])))))
+      sum((as.numeric(mf[, k]) - mean(as.numeric(mf[, k])))^2))
     vdf[k - 1, 4] <- 1 / (1 - r2)
     vdf[k - 1, 5] <- r2
   }

@@ -199,8 +199,8 @@ about the effect our predictors have on the response.
 We now take our selected model and build individual importance plots for it 
 using `ggvip`.
 
-```{r, warning=FALSE, message=FALSE, fig.width=6.2, fig.height=6, fig.align='center'}
-g <- ggvip(m$rf33)$both_vips
+```{r, warning=FALSE, message=FALSE, fig.width=6, fig.height=5, fig.align='center'}
+g <- ggvip(m$rf33, num_var = 12)$both_vips
 ```
 
 We have used the `randomForestVIP` package to tune a model for prediction and with 

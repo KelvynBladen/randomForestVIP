@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/KelvynBladen/randomForestVIP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/KelvynBladen/randomForestVIP/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 The goal of `randomForestVIP` is to tune and select a good Random Forest model based on 
@@ -126,8 +127,8 @@ yielding slightly more accurate results.
 We now take our selected model and build individual importance plots for it 
 using `ggvip`.
 
-```{r, warning=FALSE, message=FALSE, fig.width=4, fig.height=4, fig.align='center'}
-g <- ggvip(m$rf9)$both_vips
+```{r, warning=FALSE, message=FALSE, fig.width=5, fig.height=5, fig.align='center'}
+g <- ggvip(m$rf9, num_var = 7)$both_vips
 ```
 
 The plot above resembles a standard variable importance plot, but possesses 

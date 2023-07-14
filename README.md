@@ -6,6 +6,7 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/KelvynBladen/randomForestVIP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/KelvynBladen/randomForestVIP/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 The goal of `randomForestVIP` is to tune and select a good Random Forest
@@ -143,7 +144,7 @@ We now take our selected model and build individual importance plots for
 it using `ggvip`.
 
 ``` r
-g <- ggvip(m$rf9)$both_vips
+g <- ggvip(m$rf9, num_var = 7)$both_vips
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" />
