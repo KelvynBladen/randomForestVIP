@@ -13,13 +13,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-# rfvip
+# randomForestVIP
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/KelvynBladen/rfvip/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/KelvynBladen/rfvip/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/KelvynBladen/randomForestVIP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/KelvynBladen/randomForestVIP/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of `rfvip` is to tune and select a good Random Forest model based on 
+The goal of `randomForestVIP` is to tune and select a good Random Forest model based on 
 the accuracy and variable importance metrics associated with each model. To 
 accomplish this, functions are available to tabulate and plot results designed 
 to help the user select an optimal model. 
@@ -49,30 +49,30 @@ Applications in R" <https://digitalcommons.usu.edu/etd/8587/>.
 
 ## Installation
 
-You can install the released version of rfvip from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of `randomForestVIP` from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-install.packages("rfvip")
+install.packages("randomForestVIP")
 ```
 
-You can install the development version of rfvip from [GitHub](https://github.com/) with:
+You can install the development version of `randomForestVIP` from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("KelvynBladen/rfvip")
+devtools::install_github("KelvynBladen/randomForestVIP")
 ```
 
-You can view R package's source code on GitHub: <https://github.com/KelvynBladen/rfvip>
+You can view R package's source code on GitHub: <https://github.com/KelvynBladen/randomForestVIP>
 
 ## Example
 
 ```{r, warning=FALSE, message=FALSE}
-library(rfvip)
+library(randomForestVIP)
 library(MASS)
 library(EZtune)
 ```
 
-To introduce the functionality of `rfvip`, we look at modeling the Boston 
+To introduce the functionality of `randomForestVIP`, we look at modeling the Boston 
 housing data (found in the MASS package). We want to 
 build a Random Forest model with a view towards both accuracy and 
 interpretability. We begin by running some preliminary diagnostics on our data.
@@ -133,6 +133,6 @@ g <- ggvip(m$rf9)$both_vips
 The plot above resembles a standard variable importance plot, but possesses 
 superior tick labels and editing capabilities for the analyst. 
 
-We have used the `rfvip` package to tune a strong model for prediction and with 
+We have used the `randomForestVIP` package to tune a strong model for prediction and with 
 reasonably useful importance values. This was accomplished by assessing 
 variable importance and accuracy metrics across the hyper-parameter mtry.
