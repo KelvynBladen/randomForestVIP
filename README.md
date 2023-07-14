@@ -85,7 +85,7 @@ pcs$plot_y_part_cors
 ``` r
 
 rv <- robust_vifs(medv ~ ., data = Boston, model = lm)
-rv$plot_nonlin_vifs
+rv$plot_lin_vifs
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-2.png" width="100%" style="display: block; margin: auto;" />

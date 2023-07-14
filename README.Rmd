@@ -85,8 +85,10 @@ pcs <- partial_cor(medv ~ ., data = Boston, model = lm)
 pcs$plot_y_part_cors
 
 rv <- robust_vifs(medv ~ ., data = Boston, model = lm)
-rv$plot_nonlin_vifs
+rv$plot_lin_vifs
 ```
+
+
 
 These functions assess concerns with collinearity. Notice that the VIFs from 
 `robust_vifs` are all less than 10. The partial correlations with the response 
