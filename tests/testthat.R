@@ -1,4 +1,4 @@
 library(testthat)
-library(rfvip)
+library(randomForestVIP)
 
-test_check("rfvip")
+test_check("randomForestVIP")

@@ -1,10 +1,10 @@
 ---
-title: "rfvip Vignette"
+title: "randomForestVIP Vignette"
 author: "Kelvyn Bladen"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{rfvip Vignette}
+  %\VignetteIndexEntry{randomForestVIP Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-The goal of `rfvip` is to tune and select a Random Forest model with high
+The goal of `randomForestVIP` is to tune and select a Random Forest model with high
 accuracy and interpretability. This is done by tuning the Random Forest 
 based on the accuracy and variable importance metrics associated with each 
 model. To accomplish this, functions are available to tabulate and plot 
@@ -50,12 +50,12 @@ Applications in R" <https://digitalcommons.usu.edu/etd/8587/>.
 ## Example: Boston
 
 ```{r, warning=FALSE, message=FALSE}
-library(rfvip)
+library(randomForestVIP)
 library(MASS)
 library(EZtune)
 ```
 
-To introduce the functionality of `rfvip`, we look at modeling the Boston 
+To introduce the functionality of `randomForestVIP`, we look at modeling the Boston 
 housing data (found in the MASS package). We want to 
 build a Random Forest model with a view towards both accuracy and 
 interpretability. We begin by running some preliminary diagnostics on our data.
@@ -116,17 +116,17 @@ g <- ggvip(m$rf9)$both_vips
 The plot above resembles a standard variable importance plot, but possesses 
 superior tick labels and editing capabilities for the analyst. 
 
-We have used the `rfvip` package to tune a strong model for prediction and with 
+We have used the `randomForestVIP` package to tune a strong model for prediction and with 
 reasonably useful importance values. This was accomplished by assessing 
 variable importance and accuracy metrics across the hyper-parameter mtry.
 
 ## Example: Lichens in Pacific Northwest
 
 ```{r, warning=FALSE, message=FALSE}
-library(rfvip)
+library(randomForestVIP)
 ```
 
-To further demonstrate the functionality of `rfvip`, we provide another 
+To further demonstrate the functionality of `randomForestVIP`, we provide another 
 example. This time using classification data. We look at modeling the Lichen 
 data (found in the EZtune package) with a view towards both accuracy and 
 interpretability. The response is presence or absence (coded 0 or 1) of a 
@@ -203,6 +203,6 @@ using `ggvip`.
 g <- ggvip(m$rf33)$both_vips
 ```
 
-We have used the `rfvip` package to tune a model for prediction and with 
+We have used the `randomForestVIP` package to tune a model for prediction and with 
 superior importance values. This was accomplished by assessing variable 
 importance and accuracy metrics across the hyper-parameter mtry.
