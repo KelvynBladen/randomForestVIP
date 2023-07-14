@@ -39,3 +39,4 @@ test_that("num_var prop", {
     Sepal.Length + Petal.Width, data = iris, num_var = 2)
   expect_equal(p$summary, p1$summary)
 })
+

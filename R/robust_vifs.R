@@ -67,6 +67,8 @@ robust_vifs <- function(formula, data, model = randomForest,
 
   for (k in seq_len(ncol(mf) - 1) + 1) {
     r <- model(as.numeric(mf[, k]) ~ ., mf[, -c(1, k)])
+    # forest yields message regarding regression. Need to change predictor class
+    # or if logic for model development
 
     # Consider Fixes that use a test or OOB or CV error rather than
     # training Error.
@@ -95,6 +97,7 @@ robust_vifs <- function(formula, data, model = randomForest,
   } else {
     vdfl <- vdf
   }
+
 
   if (log10 != TRUE) {
     g <- vdfl %>% ggplot(aes(y = var, x = lm_vif)) +
@@ -166,3 +169,5 @@ robust_vifs <- function(formula, data, model = randomForest,
 
   l
 }
+
+
