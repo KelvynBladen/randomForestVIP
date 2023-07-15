@@ -14,9 +14,8 @@ This is a resubmission. In this version I have:
 * ubuntu-latest (release)
 * ubuntu-latest (oldrel-1)
 
-
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 0 notes
 
-* New submission.
+R CMD check succeeded
