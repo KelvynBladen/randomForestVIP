@@ -1,3 +1,11 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Identified and cleaned auto error regarding latex symbol. Error occurred because of copy/paste symbol 
+  undetected by CMD checks.
+
+* Updated Vignettes and package name.
+
 ## Test environments
 * local R installation, R 4.2.1
 * macos-latest (release)
