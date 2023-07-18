@@ -1,7 +1,9 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Removed the license file and updated the description file as requested.
+* Updated the description file authors formatting as requested.
+
+* Updated the description text for improvement.
 
 ## Test environments
 * local R installation, R 4.2.1
