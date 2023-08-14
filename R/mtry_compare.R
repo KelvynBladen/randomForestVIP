@@ -40,7 +40,7 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   num_preds <- ncol(model_frame) - 1
 
   m1 <- 1
-  m2 <- ifelse(class(model_frame[1, 1]) == "numeric" & num_preds > 2,
+  m2 <- ifelse(is(model_frame[1, 1], "numeric") & num_preds > 2,
     floor(num_preds / 3), floor(sqrt(num_preds))
   )
   m3 <- ceiling(mean(c(m2, num_preds)))
@@ -109,14 +109,14 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   for (i in mvec) {
     mod <- get(paste0("srf", i))
 
-    ifelse(class(model_frame[1, 1]) == "numeric",
+    ifelse(is(model_frame[1, 1], "numeric"),
       err_v <- c(err_v, mod$mse[mod$ntree]),
       err_v <- c(err_v, mod$err.rate[mod$ntree])
     )
   }
   err_v <- err_v[-1]
 
-  ifelse(class(model_frame[1, 1]) == "numeric",
+  ifelse(is(model_frame[1, 1], "numeric"),
     err_df <- data.frame(mtry = mvec, mse = err_v),
     err_df <- data.frame(mtry = mvec, misclass_rate = err_v)
   )
