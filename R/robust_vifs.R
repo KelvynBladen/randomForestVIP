@@ -1,7 +1,8 @@
 #' Non-linear Variance Inflation Factors
 #' @name robust_vifs
 #' @importFrom stats lm model.frame
-#' @importFrom ggplot2 ggplot geom_point xlim ylim geom_line ggtitle geom_vline
+#' @importFrom ggplot2 ggplot geom_point xlim ylim aes
+#'   geom_line ggtitle geom_vline
 #' @importFrom dplyr %>% arrange desc
 #' @importFrom car vif
 #' @description A list of data.frames and useful plots for user evaluations of
@@ -78,7 +79,7 @@ robust_vifs <- function(formula, data, model = randomForest,
     vdf[k - 1, 5] <- r2
   }
 
-  if (log10 == TRUE) {
+  if (log10) {
     vdf$lm_vif <- log10(vdf$lm_vif)
     vdf$model_vif <- log10(vdf$model_vif)
     colnames(vdf)[c(2, 4)] <- c("Log10_lm_vif", "Log10_model_vif")

@@ -3,8 +3,9 @@
 #' @importFrom randomForest importance
 #' @importFrom dplyr %>% arrange desc filter between case_when
 #' @importFrom ggplot2 ggplot geom_point xlim xlab ylab ggtitle theme
-#'   aes_string element_text
+#'   aes element_text
 #' @importFrom gridExtra grid.arrange
+#' @importFrom rlang .data
 #' @description A ggplot of variable importance as measured by a Random Forest.
 #' @param x An object of class randomForest.
 #' @param scale For permutation based measures such as MSE or Accuracy, should
@@ -83,9 +84,9 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     )
 
     g <- imp_frame %>%
-      ggplot(aes_string(
-        x = colnames(imp_frame)[1],
-        y = colnames(imp_frame)[2]
+      ggplot(aes(
+        x = .data[[colnames(imp_frame)[1]]],
+        y = .data[[colnames(imp_frame)[2]]]
       )) +
       geom_point() +
       scale_x_continuous(
@@ -93,8 +94,8 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
         breaks = seq(0, newm, by = newm / div)
       ) +
       ylab(NULL) +
-      xlab(ifelse(sqrt == FALSE, colnames(imp_frame)[1],
-        paste0("sqrt(", colnames(imp_frame)[1], ")")
+      xlab(ifelse(sqrt, paste0("sqrt(", colnames(imp_frame)[1], ")"),
+                  colnames(imp_frame)[1]
       )) +
       ggtitle("VIP") +
       theme(plot.title = element_text(hjust = 0.5))
@@ -139,9 +140,9 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     )), ]
 
     g1 <- imp_frame %>%
-      ggplot(aes_string(
-        x = colnames(imp_frame)[1],
-        y = colnames(imp_frame)[3]
+      ggplot(aes(
+        x = .data[[colnames(imp_frame)[1]]],
+        y = .data[[colnames(imp_frame)[3]]]
       )) +
       geom_point() +
       scale_x_continuous(
@@ -149,8 +150,9 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
         breaks = seq(0, newm, by = newm / div)
       ) +
       ylab(NULL) +
-      xlab(ifelse(sqrt == FALSE, colnames(imp_frame)[1],
-        paste0("sqrt(", colnames(imp_frame)[1], ")")
+      xlab(ifelse(sqrt,
+                  paste0("sqrt(", colnames(imp_frame)[1], ")"),
+                  colnames(imp_frame)[1]
       ))
 
     imp_frame <- imp_frame[do.call(base::order, as.list(imp_frame[2])), ]
@@ -183,9 +185,9 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
     )), ]
 
     g2 <- imp_frame %>%
-      ggplot(aes_string(
-        x = colnames(imp_frame)[2],
-        y = colnames(imp_frame)[3]
+      ggplot(aes(
+        x = .data[[colnames(imp_frame)[2]]],
+        y = .data[[colnames(imp_frame)[3]]]
       )) +
       geom_point() +
       scale_x_continuous(
@@ -193,8 +195,8 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
         breaks = seq(0, newm, by = newm / div)
       ) +
       ylab(NULL) +
-      xlab(ifelse(sqrt == FALSE, colnames(imp_frame)[2],
-        paste0("sqrt(", colnames(imp_frame)[2], ")")
+      xlab(ifelse(sqrt, paste0("sqrt(", colnames(imp_frame)[2], ")"),
+                  colnames(imp_frame)[2]
       ))
 
     l <- list()

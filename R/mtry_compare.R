@@ -4,9 +4,11 @@
 #' @importFrom dplyr %>% arrange across ends_with desc filter select
 #'   summarise group_by case_when
 #' @importFrom ggplot2 ggplot geom_point geom_line ylab ggtitle theme
-#'   aes_string scale_x_continuous scale_y_continuous
+#'   aes scale_x_continuous scale_y_continuous
 #' @importFrom tidyr pivot_wider
 #' @importFrom stats model.frame na.omit quantile
+#' @importFrom methods is
+#' @importFrom rlang .data
 #' @description A list of data.frames and useful plots for user evaluations of
 #'   the randomForest hyperparameter mtry.
 #' @param formula an object of class "\link{formula}" (or one that can be
@@ -185,9 +187,9 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   )
 
   g1 <- sd %>%
-    ggplot(aes_string(
-      x = colnames(sd)[4], y = colnames(sd)[1],
-      color = colnames(sd)[3], group = colnames(sd)[3]
+    ggplot(aes(
+      x = .data[[colnames(sd)[4]]], y = .data[[colnames(sd)[1]]],
+      color = .data[[colnames(sd)[3]]], group = .data[[colnames(sd)[3]]]
     )) +
     geom_point() +
     geom_line() +
@@ -218,9 +220,9 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   )
 
   g2 <- sd %>%
-    ggplot(aes_string(
-      x = colnames(sd)[4], y = colnames(sd)[2],
-      color = colnames(sd)[3], group = colnames(sd)[3]
+    ggplot(aes(
+      x = .data[[colnames(sd)[4]]], y = .data[[colnames(sd)[2]]],
+      color = .data[[colnames(sd)[3]]], group = .data[[colnames(sd)[3]]]
     )) +
     geom_point() +
     geom_line() +
@@ -251,7 +253,8 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
   )
 
   g_err <- err_df %>%
-    ggplot(aes_string(x = colnames(err_df)[1], y = colnames(err_df)[2])) +
+    ggplot(aes(x = .data[[colnames(err_df)[1]]],
+               y = .data[[colnames(err_df)[2]]])) +
     geom_point() +
     geom_line() +
     scale_x_continuous(limits = c(1, num_preds), breaks = mvec) +

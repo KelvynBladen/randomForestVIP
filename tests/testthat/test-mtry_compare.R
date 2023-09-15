@@ -136,3 +136,11 @@ test_that("sqrt invalid character", {
   m1 <- mtry_compare(formula = factor(Species) ~ ., data = iris, sqrt = FALSE)
   expect_equal(m$importance, m1$importance)
 })
+
+test_that("Non-numeric Numbers", {
+  set.seed(123)
+  m <- mtry_compare(formula = as.integer(carb) ~ ., data = mtcars)
+  set.seed(123)
+  m1 <- mtry_compare(formula = carb ~ ., data = mtcars)
+  expect_equal(m$importance, m1$importance)
+})

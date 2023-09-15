@@ -1,10 +1,14 @@
-#' Mtry Tune via VIPs
+#' Plot Caret Grid Search Hyper-parameter Tuning Results
 #' @name caret_plot
-#' @importFrom dplyr %>% select summarise group_by case_when
-#' @importFrom ggplot2 ggplot geom_point geom_line ylab ggtitle theme
-#'   aes_string scale_x_continuous scale_y_continuous
-#' @description A list of data.frames and useful plots for comparing the
-#'   performance of models across their hyper-parameters.
+#' @importFrom dplyr %>% summarise group_by case_when relocate
+#' @importFrom ggplot2 ggplot geom_point geom_line geom_tile ggtitle facet_grid
+#'   scale_fill_gradient aes scale_x_continuous scale_y_continuous
+#' @importFrom caret train trainControl
+#' @importFrom rlang .data
+#' @description This function uses caret grid training results to generate
+#'   performance data.frames, heatmaps, and other plots for comparing the
+#'   performance of models across their hyper-parameters and evaluating
+#'   interactions between different model hyper-parameters.
 #' @param x An object of class train.
 #' @param sqrt Boolean value indicating whether assessment metrics should be
 #'   adjusted via a square root transformation. Default is FALSE.
@@ -20,8 +24,8 @@
 #'   relevant for heatmaps of 3 or more dimensions. Default is NULL.
 #' @param facet Name of the variable to plot as the facets of heatmaps. Only
 #'   relevant for heatmaps of 4 dimensions. Default is NULL.
-#' @return A list of data.frames, useful plots, and forest objects for user
-#'   evaluations of the randomForest hyperparameter mtry.
+#' @return A list of caret training performance data.frames, heatmaps, and
+#'   plots.
 #' @examples
 #' set.seed(123)
 #' fit_control <- trainControl(method = "cv", number = 10)
@@ -33,7 +37,7 @@
 #' p
 #' @export
 
-caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
+caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = FALSE, marg2 = FALSE,
                        col = NULL, row = NULL, facet = NULL) {
   # class should be train
 
@@ -56,9 +60,9 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
   }
 
   if (length(res) > 3) {
-    a <- apply(res[, 1:(length(res) - 1)], 2, function(x) length(unique(x)))
-    w <- which(a == 1)
-    res <- res %>% select(!all_of(w))
+    a <- apply(res[, 1:length(res)], 2, function(x) length(unique(x)))
+    w <- which(a != 1)
+    res <- res[,w]
   }
 
   if (sqrt == TRUE) {
@@ -133,8 +137,8 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
 
   if (length(res) == 4) {
     res <- res %>%
-      relocate(row, .before = 3) %>%
-      relocate(col, .before = 2)
+      relocate(all_of(row), .before = 3) %>%
+      relocate(all_of(col), .before = 2)
     lava <- res
     lava[[1]] <- as.factor(lava[[1]])
     lava[[2]] <- as.factor(lava[[2]])
@@ -160,9 +164,9 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
 
   if (length(res) == 5) {
     res <- res %>%
-      relocate(facet, .before = 4) %>%
-      relocate(row, .before = 3) %>%
-      relocate(col, .before = 2)
+      relocate(all_of(facet), .before = 4) %>%
+      relocate(all_of(row), .before = 3) %>%
+      relocate(all_of(col), .before = 2)
     lava <- res
     lava[[1]] <- as.factor(lava[[1]])
     lava[[2]] <- as.factor(lava[[2]])
@@ -195,7 +199,7 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
   names(l)[2] <- paste0("full_", r1)
   names(l)[3] <- paste0("full_", r2)
 
-  if (marg1 == TRUE) {
+  if (marg1) {
     if (length(res) > 3) {
       lava <- res
       vc1 <- colnames(lava)[length(lava) - 1]
@@ -206,7 +210,8 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
           group_by(.data[[i]]) %>%
           summarise(
             v1 = mean(get(vc1)),
-            v2 = mean(get(vc2))
+            v2 = mean(get(vc2)),
+            .groups = "keep"
           )
 
         colnames(marg)[2:3] <- c(vc1, vc2)
@@ -270,7 +275,7 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
     }
   }
 
-  if (marg2 == TRUE) {
+  if (marg2) {
     if (length(res) > 4) {
       lava <- res
       vc1 <- colnames(lava)[length(lava) - 1]
@@ -283,7 +288,8 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
           group_by(.data[[mv[1]]], .data[[mv[2]]]) %>%
           summarise(
             v1 = mean(get(vc1)),
-            v2 = mean(get(vc2))
+            v2 = mean(get(vc2)),
+            .groups = "keep"
           )
 
         colnames(marg)[3:4] <- c(vc1, vc2)
@@ -323,12 +329,22 @@ caret_plot <- function(x = gbmFit, sqrt = FALSE, marg1 = TRUE, marg2 = TRUE,
 
 
 ########################################
+set.seed(123)
+fit_control <- trainControl(method = "cv", number = 10)
+gbm_grid <- expand.grid(interaction.depth = c(1, 4), n.trees = c(15, 150),
+                        shrinkage = c(0.05, 0.1), n.minobsinnode = 10)
+x <- train(factor(Species) ~ ., method = "gbm", tuneGrid = gbm_grid,
+                 trControl = fit_control, data = iris)
+p <- caret_plot(x, sqrt = FALSE, col = "n.trees", marg1 = TRUE, marg2 = TRUE)
+p$full_acc
 ########################################
-
+library(caret)
+library(randomForest)
+library(tidyverse)
+library(ranger)
 fit_control <- trainControl(method = "cv", number = 10)
 rf_grid <- expand.grid(
-  mtry = c(1, 2, 3, 4),
-  ntree = c(25, 100, 200)
+  mtry = c(1, 2, 3, 4)
 )
 
 rffit <- train(factor(Species) ~ .,
@@ -338,18 +354,68 @@ rffit <- train(factor(Species) ~ .,
   trControl = fit_control
 )
 
-rf <- randomForest(factor(Species) ~ .,
-  data = iris, mtry = 3
-)
-
-
 x <- rffit
 rffit$bestTune
 ca <- caret_plot(x)
-ca
+ca$full_acc + ylim(.93, .97)
 
-ca$caret_rmse
-ca$caret_rsq
+
+fit_control <- trainControl(method = "cv", number = 10)
+rf_grid <- expand.grid(
+  mtry = c(1, 2, 3, 4),
+  splitrule = c("gini", "extratrees"),
+  #splitrule = c("variance", "extratrees", "maxstat"),
+  min.node.size = c(1, 5, 10, 20, 40)
+)
+
+rffit <- train(factor(Species) ~ .,
+               data = iris,
+               method = "ranger",
+               tuneGrid = rf_grid,
+               trControl = fit_control
+)
+
+x <- rffit
+rffit$bestTune
+
+ca <- caret_plot(x, facet = "splitrule")
+ca$full_acc
+
+library(mlbench)
+data("BreastCancer")
+BreastCancer <- BreastCancer[,-1]
+
+BreastCancer <- na.omit(BreastCancer)
+
+rf_grid <- expand.grid(
+  mtry = c(1, 3, 6, 8, 10),
+  splitrule = c("gini", "extratrees"),
+  #splitrule = c("variance", "extratrees", "maxstat"),
+  min.node.size = c(1, 5, 10, 20, 40)
+)
+
+rffit <- train(factor(Class) ~ .,
+               data = BreastCancer,
+               method = "ranger",
+               tuneGrid = rf_grid,
+               trControl = fit_control
+)
+
+x <- rffit
+rffit$bestTune
+
+caret_plot()
+
+ca <- caret_plot(x, facet = "splitrule", marg1 = T, marg2 = T)
+ca$full_acc
+
+setwd("C:/Users/kelvy/Downloads")
+ggsave("hyper-parameter tuning plot.jpg", ca$full_acc)
+setwd("C:/Users/kelvy/github/packages/randomForestVIP")
+ca$min.node.size_acc
+ca$mtry_acc
+ca$min.node.size_data
+ca$mtry_data
 
 library(mlbench)
 data(BostonHousing)
@@ -367,8 +433,9 @@ rpart_fit <- train(medv ~ .,
 )
 x <- rpart_fit
 ca <- caret_plot(x)
-ca$caret_rmse
-ca$caret_rsq
+ca$full_rmse
+ca$full_rsq
+ca$full_data
 
 data(iris)
 train_data <- iris[, 1:4]
@@ -383,9 +450,9 @@ knn_fit1 <- train(train_data, train_classes,
 
 x <- knn_fit1
 ca <- caret_plot(x)
-ca$results
-ca$caret_acc
-ca$caret_kappa
+ca$full_data
+ca$full_acc
+ca$full_kappa
 
 
 library(caret)
@@ -406,10 +473,13 @@ gbm_grid <- expand.grid(
 
 gbm_fit <- train(medv ~ .,
   method = "gbm", tuneGrid = gbm_grid,
-  trControl = fit_control, data = Boston
+  trControl = fit_control, data = boston
 )
 x <- gbm_fit
-
+cg <- caret_plot(x)
+cg$full_data
+cg$full_rmse
+cg$full_rsq
 
 gbm_grid <- expand.grid(
   interaction.depth = c(4, 8, 12, 16),
@@ -420,17 +490,20 @@ gbm_grid <- expand.grid(
 
 gbm_fit <- train(medv ~ .,
   method = "gbm", tuneGrid = gbm_grid,
-  trControl = fit_control, data = Boston
+  trControl = fit_control, data = boston
 )
 x <- gbm_fit
 
 cag <- caret_plot(x, sqrt = FALSE, col = "n.trees", marg1 = TRUE, marg2 = TRUE)
 cag <- caret_plot(x, sqrt = FALSE, col = "n.trees", facet = "shrinkage")
-cag$caret_rmse
-cag$caret_rsq
-cag$results
+cag$full_rmse
+cag$full_rsq
+cag$full_data
 
-
+getModelInfo("rf")
+modelLookup("rf")
+modelLookup("gbm")
+modelLookup("ranger")
 
 fit_control <- trainControl(method = "cv", number = 10)
 gbm_grid <- expand.grid(interaction.depth = c(1, 4), n.trees = c(15, 150),
