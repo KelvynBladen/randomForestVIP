@@ -3,5 +3,6 @@ utils::globalVariables(c(
   "Mutual_Info", "model_vif", "lm_vif",
   "Log10_lm_vif", "Log10_model_vif",
   "lm_R2", "model_R2", "lm_r2",
-  "urfAccuracy", "urfPurity"
+  "urfAccuracy", "urfPurity",
+  "yhat", "trim_range", "y"
 ))

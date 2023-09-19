@@ -25,15 +25,20 @@ Depends:
     R (>= 4.0.0)
 Imports:
     car,
+    caret,
     dplyr,
+    gbm,
+    ggeasy,
     ggplot2,
     gridExtra,
     methods,
     minerva,
+    pdp,
     randomForest,
     rlang,
     stats,
-    tidyr
+    tidyr,
+    trelliscopejs
 Suggests: 
     EZtune,
     e1071,
