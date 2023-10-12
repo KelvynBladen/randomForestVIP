@@ -267,7 +267,22 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
           axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
           plot.title = element_text(size = 14, face = "bold")
-        )
+        ) +
+        ggeasy::easy_center_title() +
+        ggeasy::easy_plot_legend_size(size = 11)
+
+      g1 <- v %>%
+        ggplot(aes(x = x, y = y)) +
+        geom_line() +
+        xlab(i) +
+        guides(size = "none") +
+        theme(
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          plot.title = element_text(size = 14, face = "bold")
+        ) +
+        ggeasy::easy_center_title() +
+        ggeasy::easy_plot_legend_size(size = 11)
     }
 
     if (i %in% fvec) {
@@ -285,14 +300,39 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
           axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
           plot.title = element_text(size = 14, face = "bold")
-        )
+        ) +
+        ggeasy::easy_center_title() +
+        ggeasy::easy_plot_legend_size(size = 11)
+
+      g1 <- v %>%
+        ggplot(aes(x = x, y = y)) +
+        geom_line() +
+        xlab(i) +
+        guides(size = "none") +
+        theme(
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          plot.title = element_text(size = 14, face = "bold")
+        ) +
+        ggeasy::easy_center_title() +
+        ggeasy::easy_plot_legend_size(size = 11)
     }
 
     gl$j <- g
     names(gl)[j] <- i
     j <- j + 1
+
+    gl$j <- g1
+    names(gl)[j] <- paste0("zoom_", i)
+    j <- j + 1
   }
 
+  greg <- gregexec("zoom.*", names(gl))
+  gmatch <- regmatches(names(gl), greg)
+  gl1 <- gl[names(gl)[!names(gl) %in% gmatch]]
+  gl2 <- gl[names(gl)[names(gl) %in% gmatch]]
+
+  gl <- c(gl1, gl2)
   gl
 }
 
@@ -301,10 +341,6 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
 # library(dplyr)
 # mtcars_rf <- randomForest(formula = mpg ~ ., data = mtcars)
 # car_pd <- pdp_compare(x = mtcars_rf)
-# car_pd$imp
-# car_pd$full
-# car_pd$drat
-# car_pd$cyl
 # car_pd$imp
 # grid.arrange(car_pd$wt, car_pd$disp, car_pd$hp, car_pd$cyl, nrow = 2)
 #
@@ -318,8 +354,6 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
 # house_pd$trellis_num
 # house_pd$trellis_fac
 # randomForest::ImpPlot(house.rf)
-# house_pd$imp
-# house_pd$full_num
 #
 # cor(house_pd$imp[-1])
 # plot(house_pd$imp[-1])
@@ -335,7 +369,6 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
 # house_pd1$imp
 # house_pd1$full_num
 #
-#
 # cor(house_pd1$imp[-1])
 # plot(house_pd1$imp[-1])
 #
@@ -350,8 +383,6 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
 # li$ReserveStatus <- as.factor(li$ReserveStatus)
 #
 # library(tidyverse)
-# library(randomForest)
-# library(pdp)
 #
 # set.seed(1234)
 # lo_rf <- randomForest(

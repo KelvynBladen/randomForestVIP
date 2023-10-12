@@ -2,9 +2,9 @@
 #' @name ggvip
 #' @importFrom randomForest importance
 #' @importFrom dplyr %>% arrange desc filter between case_when
-#' @importFrom ggplot2 ggplot geom_point xlim xlab ylab ggtitle theme
-#'   aes element_text
+#' @importFrom ggplot2 ggplot geom_point xlim xlab ylab ggtitle aes
 #' @importFrom gridExtra grid.arrange
+#' @importFrom ggeasy easy_center_title
 #' @importFrom rlang .data
 #' @description A ggplot of variable importance as measured by a Random Forest.
 #' @param x An object of class randomForest.
@@ -98,7 +98,7 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
                   colnames(imp_frame)[1]
       )) +
       ggtitle("VIP") +
-      theme(plot.title = element_text(hjust = 0.5))
+      easy_center_title()
 
     l <- list()
     l$vip <- g
@@ -201,15 +201,21 @@ ggvip <- function(x, scale = FALSE, sqrt = TRUE, type = "both", num_var) {
 
     l <- list()
     if (type %in% c("mse", "acc", 1)) {
-      l$vip <- g1
+      l$vip <- g1 +
+        ggtitle("Permutation Importance") +
+        easy_center_title()
       l$table <- imp_frame1[, -2]
     } else if (type %in% c("purity", "gini", 2)) {
-      l$vip <- g2
+      l$vip <- g2 +
+        ggtitle("Purity Importance") +
+        easy_center_title()
       l$table <- imp_frame2[, -1]
     } else {
-      l$both_vips <- gridExtra::grid.arrange(g1, g2,
+      l$both_vips <- gridExtra::grid.arrange(
+        g1,
+        g2,
         nrow = 1,
-        top = "Variable Importances using ggplot Graphics"
+        top = "Variable Importance"
       )
       l$accuracy_vip <- g1
       l$purity_vip <- g2

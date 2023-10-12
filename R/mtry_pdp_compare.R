@@ -375,6 +375,19 @@ mtry_pdp_compare <- function(formula, data = NULL, mvec, var_vec,
   l
 }
 
+# m <- mtry_pdp_compare(formula = factor(LobaOreg)~., data = lichen)
+# gr <- gridExtra::grid.arrange(m$MinTempAve, m$ACONIF,
+#                               m$Elevation, m$MinTempDiff,
+#                               m$AmbVapPressAve, m$AveTempAve, nrow = 3)
+# ggsave("gr.jpg",
+#        gridExtra::grid.arrange(m$MinTempAve + ylab(""),
+#                                m$ACONIF + ylab(""),
+#                                m$Elevation + ylab("") + xlab("xElevation"),
+#                                m$MinTempDiff + ylab(""),
+#                                m$AmbVapPressAve + ylab(""),
+#                                m$AveTempAve + ylab(""), nrow = 3),
+#        dpi = 2800, width = 8, height = 8)
+# library(ggplot2)
 # m <- mtry_pdp_compare(formula = medv ~ ., data = MASS::Boston)
 # m$full_num
 # m$full_fac

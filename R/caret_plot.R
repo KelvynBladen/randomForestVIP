@@ -203,7 +203,7 @@ caret_plot <- function(x, sqrt = FALSE, marg1 = FALSE, marg2 = FALSE,
   names(l)[2] <- paste0("full_", r1)
   names(l)[3] <- paste0("full_", r2)
 
-  if (marg1) {
+  if (marg1 == T) {
     if (length(res) > 3) {
       lava <- res
       vc1 <- colnames(lava)[length(lava) - 1]
@@ -279,7 +279,7 @@ caret_plot <- function(x, sqrt = FALSE, marg1 = FALSE, marg2 = FALSE,
     }
   }
 
-  if (marg2) {
+  if (marg2 == T) {
     if (length(res) > 4) {
       lava <- res
       vc1 <- colnames(lava)[length(lava) - 1]

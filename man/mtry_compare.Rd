@@ -31,12 +31,15 @@ adjusted via a square root transformation. Default is True.}
 \item{num_var}{Optional integer argument for reducing the number of
 variables to the top 'num_var'. Should be an integer between 1 and the
 total number of predictor variables in the model or it should be a
-positive proportion of variables desired.}
+positive proportion of variables desired. If not provided, all variables
+are used.}
 
 \item{mvec}{Optional vector argument for defining choices of mtry to have the
 function consider. Should be a vector of integers between 1 and the total
 number of predictor variables in the model. Or it can be a vector of
-proportions (strictly less than 1) of the number of predictor variables.}
+proportions (between 0 and 1) of the number of predictor variables. If not
+provided, mvec is set to a vector of the lowest possible value, the
+default value, the highest possible value, and a middle value.}
 
 \item{...}{Other parameters to pass to the randomForest function.}
 }
