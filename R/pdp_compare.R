@@ -3,7 +3,7 @@
 #' @importFrom dplyr arrange desc filter select %>%
 #'   summarise group_by left_join case_when
 #' @importFrom ggplot2 ggplot geom_point geom_line xlab theme theme_bw
-#'   scale_y_continuous aes facet_wrap guides geom_smooth
+#'   scale_y_continuous aes facet_wrap guides geom_smooth element_text
 #' @importFrom gridExtra grid.arrange
 #' @importFrom stats model.frame getCall mad sd
 #' @importFrom pdp partial

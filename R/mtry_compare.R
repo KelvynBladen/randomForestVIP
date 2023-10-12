@@ -68,17 +68,6 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
     }
   }
 
-  ifelse(!missing(num_var),
-    num_var <- ifelse(dplyr::between(num_var, 0, num_preds),
-      ifelse(num_var < 1,
-        round(num_var * num_preds),
-        round(num_var)
-      ),
-      num_preds
-    ),
-    num_var <- num_preds
-  )
-
   for (i in mvec) {
     x <- paste0("srf", i)
     eval(call("<-", as.name(x), randomForest(
@@ -139,7 +128,20 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
     yl <- "Misclassification Rate"
   )
 
+  num_var <- ifelse(!missing(num_var), num_var, num_preds)
+
   if (!missing(num_var)) {
+    num_var <- ifelse(num_var > 0,
+      ifelse(num_var <= num_preds,
+        ifelse(num_var < 1,
+          round(num_var * num_preds),
+          round(num_var)
+        ),
+        num_preds
+      ),
+      num_preds
+    )
+
     d <- sd %>%
       group_by(names) %>%
       summarise(mean = mean(get(colnames(sd)[1]))) %>%

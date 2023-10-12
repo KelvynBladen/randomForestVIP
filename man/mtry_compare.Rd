@@ -28,7 +28,7 @@ the measures be divided by their "standard errors"? Default is False.}
 \item{sqrt}{Boolean value indicating whether importance metrics should be
 adjusted via a square root transformation. Default is True.}
 
-\item{num_var}{Optional integer argument for reducing the number of
+\item{num_var}{Optional integer argument for reducing the number of plotted
 variables to the top 'num_var'. Should be an integer between 1 and the
 total number of predictor variables in the model or it should be a
 positive proportion of variables desired. If not provided, all variables

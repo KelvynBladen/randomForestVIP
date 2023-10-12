@@ -3,6 +3,7 @@
 #' @importFrom randomForest randomForest
 #' @importFrom stats lm model.frame cor model.matrix predict
 #' @importFrom ggplot2 ggplot aes geom_point xlim ylim geom_line ggtitle
+#' @importFrom ggeasy easy_center_title
 #' @importFrom dplyr %>% arrange desc
 #' @importFrom minerva mine
 #' @description A list of data.frames and useful plots for user evaluations of
@@ -26,6 +27,7 @@
 #' pcs$plot_y_part_cors
 #' @export
 
+# fix xlim for all MI plots!!!
 # fix cor for factors, remove or adjust
 # unsupervised forest MI
 
@@ -39,6 +41,8 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
   mm <- model.matrix(formula, data = data)[, -1]
   mfi <- model.frame(formula, data = data)
   mf <- as.data.frame(cbind(mfi[1], mm))
+
+  res <- gsub("\\)", "", gsub(".*\\(", "", colnames(mf)[1]))
 
   m <- ncol(mf) - 1
   if (!missing(num_var)) {
@@ -91,13 +95,19 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
     g <- cd %>% ggplot(aes(y = var, x = cor)) +
       geom_point() +
       xlim(-1, 1) +
+      ylab(NULL) +
+      xlab("Correlation") +
       geom_vline(xintercept = 0, color = "blue") +
-      ggtitle("Correlations Between Predictor Variables and Response")
+      ggtitle(paste0("Correlation with ", res)) +
+      easy_center_title()
 
     g1 <- cd %>% ggplot(aes(y = var, x = abs(cor))) +
       geom_point() +
       xlim(0, 1) +
-      ggtitle("Absolute Value of Correlations")
+      ylab(NULL) +
+      xlab("abs(Correlation)") +
+      ggtitle(paste0("Absolute Value of Correlation with ", res)) +
+      easy_center_title()
 
     cd <- cd %>% arrange(desc(abs(cor)))
 
@@ -129,13 +139,19 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
     g2 <- cdf %>% ggplot(aes(y = var, x = part_cor)) +
       geom_point() +
       xlim(-1, 1) +
+      ylab(NULL) +
+      xlab("Partial Correlation") +
       geom_vline(xintercept = 0, color = "blue") +
-      ggtitle("Partial Correlations")
+      ggtitle(paste0("Partial Correlation with ", res)) +
+      easy_center_title()
 
     g3 <- cdf %>% ggplot(aes(y = var, x = abs(part_cor))) +
       geom_point() +
       xlim(0, 1) +
-      ggtitle("Absolute Value of Partial Correlations")
+      ylab(NULL) +
+      xlab("abs(Partial Correlation)") +
+      ggtitle(paste0("Absolute Value of Partial Correlation with ", res)) +
+      easy_center_title()
 
     cdf <- cdf %>% arrange(desc(abs(part_cor)))
 
@@ -159,7 +175,10 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
   g4 <- mdfm %>% ggplot(aes(y = var, x = Mutual_Info)) +
     geom_point() +
     xlim(0, 1) +
-    ggtitle("Mutual Information Between Predictor Variables and Response")
+    ylab(NULL) +
+    xlab("Mutual Information") +
+    ggtitle(paste0("Mutual Information with ", res)) +
+    easy_center_title()
 
   mdf <- mdf[do.call(base::order, as.list(mdf[3])), ]
   mdf$var <- factor(mdf$var, levels = mdf$var)
@@ -181,7 +200,10 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
       ifelse(any(mdf$urfAccuracy < 0), min(mdf$urfAccuracy), 0),
       max(mdf$urfAccuracy)
     ) +
-    ggtitle("URF Accuracy Mutual Information")
+    ylab(NULL) +
+    xlab("Mutual Information") +
+    ggtitle(paste0("URF Accuracy Mutual Information with ", res)) +
+    easy_center_title()
 
   mdf <- mdf[do.call(base::order, as.list(mdf[4])), ]
   mdf$var <- factor(mdf$var, levels = mdf$var)
@@ -203,7 +225,10 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
       ifelse(any(mdf$urfPurity < 0), min(mdf$urfPurity), 0),
       max(mdf$urfPurity)
     ) +
-    ggtitle("URF Purity Mutual Information")
+    ylab(NULL) +
+    xlab("Mutual Information") +
+    ggtitle(paste0("URF Purity Mutual Information with ", res)) +
+    easy_center_title()
 
   mdf <- mdf %>% arrange(desc(Mutual_Info))
 

@@ -3,6 +3,7 @@
 #' @importFrom stats lm model.frame
 #' @importFrom ggplot2 ggplot geom_point xlim ylim aes
 #'   geom_line ggtitle geom_vline
+#' @importFrom ggeasy easy_center_title
 #' @importFrom dplyr %>% arrange desc
 #' @importFrom car vif
 #' @description A list of data.frames and useful plots for user evaluations of
@@ -44,6 +45,8 @@ robust_vifs <- function(formula, data, model = randomForest,
 
   mf <- model.frame(formula, data = data)
   m <- ncol(mf) - 1
+
+  res <- gsub("\\)", "", gsub(".*\\(", "", colnames(mf)[1]))
 
   if (!missing(num_var)) {
     num_var <- ifelse(num_var > m | num_var <= 0, m,
@@ -104,20 +107,29 @@ robust_vifs <- function(formula, data, model = randomForest,
     g <- vdfl %>% ggplot(aes(y = var, x = lm_vif)) +
       geom_point() +
       xlim(0, max(c(vdf$Log10_lm_vif, 10))) +
-      ggtitle("Linear VIFs") +
+      ylab(NULL) +
+      xlab("VIFs") +
+      ggtitle(paste0("Linear VIFs for ", res)) +
+      easy_center_title() +
       geom_vline(xintercept = 10, color = "blue")
   } else {
     g <- vdfl %>% ggplot(aes(y = var, x = Log10_lm_vif)) +
       geom_point() +
       xlim(0, max(c(vdf$Log10_lm_vif, 1))) +
-      ggtitle("Log10 Linear VIFs") +
+      ylab(NULL) +
+      xlab("log10(VIFs)") +
+      ggtitle(paste0("Log10 Linear VIFs for ", res)) +
+      easy_center_title() +
       geom_vline(xintercept = 1, color = "blue")
   }
 
   g1 <- vdfl %>% ggplot(aes(y = var, x = lm_r2)) +
     geom_point() +
     xlim(0, 1) +
-    ggtitle("Linear R2 for Modeling each Predictor on all Others") +
+    ylab(NULL) +
+    xlab("Linear R2") +
+    ggtitle("Linear R2: Variable ~ Other Predictors") +
+    easy_center_title() +
     geom_vline(xintercept = 0.9, color = "blue")
 
   vdf <- vdf[do.call(base::order, as.list(vdf[4])), ]
@@ -138,20 +150,29 @@ robust_vifs <- function(formula, data, model = randomForest,
     g2 <- vdfm %>% ggplot(aes(y = var, x = model_vif)) +
       geom_point() +
       xlim(0, max(c(vdf$model_vif, 10))) +
-      ggtitle("Non-linear VIFs") +
+      ylab(NULL) +
+      xlab("VIFs") +
+      ggtitle(paste0("Non-Linear VIFs for ", res)) +
+      easy_center_title() +
       geom_vline(xintercept = 10, color = "blue")
   } else {
     g2 <- vdfm %>% ggplot(aes(y = var, x = Log10_model_vif)) +
       geom_point() +
       xlim(0, max(c(vdf$Log10_model_vif, 1))) +
-      ggtitle("Log10 Non-Linear VIFs") +
+      ylab(NULL) +
+      xlab("log10(VIFs)") +
+      ggtitle(paste0("Log10 Non-Linear VIFs for ", res)) +
+      easy_center_title() +
       geom_vline(xintercept = 1, color = "blue")
   }
 
   g3 <- vdfm %>% ggplot(aes(y = var, x = model_R2)) +
     geom_point() +
     xlim(0, 1) +
-    ggtitle("Non-linear R2 for Modeling each Predictor on all Others") +
+    ylab(NULL) +
+    xlab("Non-Linear R2") +
+    ggtitle("Non-Linear R2: Variable ~ Other Predictors") +
+    easy_center_title() +
     geom_vline(xintercept = 0.9, color = "blue")
 
   if (log10 != TRUE) {
