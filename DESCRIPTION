@@ -1,6 +1,6 @@
 Type: Package
 Package: randomForestVIP
-Title: Tune Random Forests Based on Variable Importance & Plot Results
+Title: Tune Random Forests Based on Variable Importance and Plot Results
 Version: 0.1.3.9000
 Authors@R: c(person("Kelvyn", "Bladen", role = c("aut", "cre"), 
              email = "kelvyn.bladen@usu.edu"),

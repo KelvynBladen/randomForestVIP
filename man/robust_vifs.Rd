@@ -4,7 +4,14 @@
 \alias{robust_vifs}
 \title{Non-linear Variance Inflation Factors}
 \usage{
-robust_vifs(formula, data, model = randomForest, log10 = TRUE, num_var, ...)
+robust_vifs(
+  formula,
+  data = NULL,
+  model = randomForest,
+  log10 = TRUE,
+  num_var,
+  ...
+)
 }
 \arguments{
 \item{formula}{an object of class "\link{formula}" (or one that can be
@@ -17,8 +24,8 @@ is called from.}
 \item{model}{Model to use for extraction partial correlations. Possible
 model choices are rpart.}
 
-\item{log10}{Applies a log10 transformation to VIFs when True. Default is
-True.}
+\item{log10}{Applies a log10 transformation to VIFs when TRUE. Default is
+TRUE.}
 
 \item{num_var}{Optional integer argument for reducing the number of
 variables to the top 'num_var'. Should be an integer between 1 and the

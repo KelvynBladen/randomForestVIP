@@ -2,7 +2,7 @@
 #' @name pdp_compare
 #' @importFrom dplyr arrange desc filter select %>%
 #'   summarise group_by left_join case_when
-#' @importFrom ggplot2 ggplot geom_point geom_line xlab theme theme_bw
+#' @importFrom ggplot2 ggplot geom_point geom_line xlab ylab theme theme_bw
 #'   scale_y_continuous aes facet_wrap guides geom_smooth element_text
 #' @importFrom gridExtra grid.arrange
 #' @importFrom stats model.frame getCall mad sd
@@ -50,11 +50,18 @@
 #'   car_pd$hp, car_pd$cyl, nrow = 2)
 #' @export
 
+# probably extend x-axis ticks for plots
+# build this process into a small function that can be called in
+# functions, especially in a for loop
+
 pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
                         trim = 0.1, trellis = TRUE,
                         which_class = 2L, prob = TRUE, ...) {
   data <- eval(getCall(x)$data)
-  model_frame <- model.frame(getCall(x)$formula, data = data)[-1]
+  model_frame <- model.frame(getCall(x)$formula, data = data)
+  res <- gsub("\\)", "", gsub(".*\\(", "", colnames(model_frame)[1]))
+  model_frame <- model_frame[-1]
+
 
   if (!missing(var_vec)) {
     model_frame <- model_frame %>% dplyr::select(all_of(var_vec))
@@ -100,7 +107,7 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
     # rename(x = i, y = yhat) %>% mutate( = i)
     names(tmp) <- c("x", "y")
 
-    ifelse(inherits(tmp$x, "numeric"),
+    ifelse(is(tmp$x, "numeric"),
            pd_num <- rbind(pd_num, cbind(tmp, var = i)),
            pd_fac <- rbind(pd_fac, cbind(tmp, var = i)))
   }
@@ -109,15 +116,15 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
 
   imp <- pd %>%
     group_by(var) %>%
-    arrange(y) %>%
-    summarise(
+    dplyr::arrange(y) %>%
+    dplyr::summarise(
       range = max(y) - min(y),
       trim_range = y[length(y) - floor(length(y) * trim)] -
         y[floor(length(y) * trim) + 1],
       sd = sd(y),
       mad = stats::mad(y, center = mean(y))
     ) %>%
-    arrange(desc(trim_range), desc(sd))
+    dplyr::arrange(desc(trim_range), desc(range))
 
   ifelse(exists("im"),
          imp <-  dplyr::left_join(imp, im, by = c("var" = "var")),
@@ -125,7 +132,6 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
 
   vvec <- unique(imp$var)
 
-  # new
   u <- max(pd[1])
   l <- min(pd[1])
   rr <- u - l
@@ -164,12 +170,12 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
   fvec <- vector(length = 0)
   if (length(pd_num) > 1) {
     pd_num <- dplyr::left_join(pd_num, imp, by = "var") %>%
-      arrange(desc(range)) %>%
+      dplyr::arrange(desc(range)) %>%
       dplyr::select(!(range:mad))
 
     nvec <- unique(pd_num$var)
 
-    pd_num <- arrange(transform(pd_num,
+    pd_num <- dplyr::arrange(transform(pd_num,
                                 var = factor(var, levels = nvec)),
                       var)
 
@@ -177,6 +183,14 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
       geom_line() +
       facet_wrap(~var, scales = "free_x") +
       theme_bw() +
+      xlab(NULL) +
+      ylab(paste0(res, " Predictions")) +
+      guides(size = "none") +
+      theme(
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 14, face = "bold")
+      ) +
       scale_y_continuous(
         limits = c(nl, nu),
         breaks = seq(nl, nu, by = nrr / div)
@@ -194,8 +208,16 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
 
       nt <- ggplot(pd_num, aes(x, y)) +
         geom_line() +
+        xlab(NULL) +
+        ylab(paste0(res, " Predictions")) +
         facet_trelliscope(~imp, scales = "free_x") + # ...
         theme_bw() +
+        guides(size = "none") +
+        theme(
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          plot.title = element_text(size = 14, face = "bold")
+        ) +
         scale_y_continuous(
           limits = c(nl, nu),
           breaks = seq(nl, nu, by = nrr / div)
@@ -206,19 +228,27 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
 
   if (length(pd_fac) > 1) {
     pd_fac <- dplyr::left_join(pd_fac, imp, by = "var") %>%
-      arrange(desc(range)) %>%
+      dplyr::arrange(desc(range)) %>%
       dplyr::select(!(range:mad))
 
     fvec <- unique(pd_fac$var)
 
-    pd_fac <- arrange(transform(pd_fac,
+    pd_fac <- dplyr::arrange(transform(pd_fac,
                                 var = factor(var, levels = fvec)),
                       var)
 
     fg <- ggplot(pd_fac, aes(x, y)) +
       geom_point() +
       facet_wrap(~var, scales = "free_x") +
+      xlab(NULL) +
+      ylab(paste0(res, " Predictions")) +
       theme_bw() +
+      guides(size = "none") +
+      theme(
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 14, face = "bold")
+      ) +
       scale_y_continuous(
         limits = c(nl, nu),
         breaks = seq(nl, nu, by = nrr / div)
@@ -237,8 +267,16 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
 
       ft <- ggplot(pd_fac, aes(x, y)) +
         geom_point() +
+        xlab(NULL) +
+        ylab(paste0(res, " Predictions")) +
         facet_trelliscope(~imp, scales = "free_x") + # ...
         theme_bw() +
+        guides(size = "none") +
+        theme(
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          plot.title = element_text(size = 14, face = "bold")
+        ) +
         scale_y_continuous(
           limits = c(nl, nu),
           breaks = seq(nl, nu, by = nrr / div)
@@ -258,6 +296,7 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
         ggplot(aes(x = x, y = y)) +
         geom_line() +
         xlab(i) +
+        ylab(paste0(res, " Predictions")) +
         scale_y_continuous(
           limits = c(nl, nu),
           breaks = seq(nl, nu, by = nrr / div)
@@ -275,6 +314,7 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
         ggplot(aes(x = x, y = y)) +
         geom_line() +
         xlab(i) +
+        ylab(paste0(res, " Predictions")) +
         guides(size = "none") +
         theme(
           axis.text = element_text(size = 12),
@@ -291,6 +331,7 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
         ggplot(aes(x = x, y = y)) +
         geom_point() +
         xlab(i) +
+        ylab(paste0(res, " Predictions")) +
         scale_y_continuous(
           limits = c(nl, nu),
           breaks = seq(nl, nu, by = nrr / div)
@@ -308,6 +349,7 @@ pdp_compare <- function(x, var_vec, scale = FALSE, sqrt = TRUE,
         ggplot(aes(x = x, y = y)) +
         geom_line() +
         xlab(i) +
+        ylab(paste0(res, " Predictions")) +
         guides(size = "none") +
         theme(
           axis.text = element_text(size = 12),

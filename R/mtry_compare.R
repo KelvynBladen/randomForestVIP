@@ -144,8 +144,8 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
 
     d <- sd %>%
       group_by(names) %>%
-      summarise(mean = mean(get(colnames(sd)[1]))) %>%
-      arrange(desc(mean)) %>%
+      dplyr::summarise(mean = mean(get(colnames(sd)[1]))) %>%
+      dplyr::arrange(desc(mean)) %>%
       filter(mean >= mean[num_var])
 
     sd <- sd %>%
@@ -160,7 +160,8 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
     as.data.frame()
   colnames(k)[-1] <- paste0("m", colnames(k)[-1])
   rownames(k) <- k$names
-  k <- k[-1] %>% arrange(desc(across(ends_with(as.character(num_preds)))))
+  k <- k[-1] %>%
+    dplyr::arrange(desc(across(ends_with(as.character(num_preds)))))
 
   n <- sd_full[-1] %>%
     pivot_wider(
@@ -170,7 +171,8 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
     as.data.frame()
   colnames(n)[-1] <- paste0("m", colnames(n)[-1])
   rownames(n) <- n$names
-  n <- n[-1] %>% arrange(desc(across(ends_with(as.character(num_preds)))))
+  n <- n[-1] %>%
+    dplyr::arrange(desc(across(ends_with(as.character(num_preds)))))
 
   m <- max(sd[1])
   v <- 10^(-3:6)
@@ -192,7 +194,7 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
 
   levs <- sd |>
     filter(mtry == num_preds) |>
-    arrange(desc(.data[[colnames(sd)[1]]])) |>
+    dplyr::arrange(desc(.data[[colnames(sd)[1]]])) |>
     mutate(names = factor(names, levels = names)) |>
     pull(names)
   sd$names <- factor(sd$names, levels = levs)
@@ -233,7 +235,7 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
 
   levs <- sd |>
     filter(mtry == num_preds) |>
-    arrange(desc(.data[[colnames(sd)[2]]])) |>
+    dplyr::arrange(desc(.data[[colnames(sd)[2]]])) |>
     mutate(names = factor(names, levels = names)) |>
     pull(names)
   sd$names <- factor(sd$names, levels = levs)
@@ -280,7 +282,7 @@ mtry_compare <- function(formula, data = NULL, scale = FALSE, sqrt = TRUE,
     )) +
     geom_point() +
     geom_line() +
-    scale_x_continuous(limits = c(1, num_preds), breaks = mvec) +
+    scale_x_continuous(breaks = mvec) +
     scale_y_continuous(
       limits = c(0, newm),
       breaks = seq(0, newm, by = newm / div)

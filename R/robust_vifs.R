@@ -15,8 +15,8 @@
 #'   is called from.
 #' @param model Model to use for extraction partial correlations. Possible
 #'   model choices are rpart.
-#' @param log10 Applies a log10 transformation to VIFs when True. Default is
-#'   True.
+#' @param log10 Applies a log10 transformation to VIFs when TRUE. Default is
+#'   TRUE.
 #' @param num_var Optional integer argument for reducing the number of
 #'   variables to the top 'num_var'. Should be an integer between 1 and the
 #'   total number of predictor variables in the model or it should be a
@@ -33,14 +33,10 @@
 # X scatterplots
 # linear & non-parametric VIFs (R^2 for the non-parametric model)
 
-robust_vifs <- function(formula, data, model = randomForest,
+robust_vifs <- function(formula, data = NULL, model = randomForest,
                         log10 = TRUE, num_var, ...) {
   if (missing(formula)) {
     stop("formula argument is a required field.")
-  }
-
-  if (missing(data)) {
-    stop("data argument is a required field.")
   }
 
   mf <- model.frame(formula, data = data)
@@ -82,7 +78,7 @@ robust_vifs <- function(formula, data, model = randomForest,
     vdf[k - 1, 5] <- r2
   }
 
-  if (log10) {
+  if (log10 == TRUE) {
     vdf$lm_vif <- log10(vdf$lm_vif)
     vdf$model_vif <- log10(vdf$model_vif)
     colnames(vdf)[c(2, 4)] <- c("Log10_lm_vif", "Log10_model_vif")
@@ -102,20 +98,45 @@ robust_vifs <- function(formula, data, model = randomForest,
     vdfl <- vdf
   }
 
+  m <- max(vdfl[2])
+  v <- 10^(-3:6)
+  ind <- findInterval(m, v)
+
+  newr <- m / (10^(ind - 5))
+  rrr <- ceiling(newr / 10) * 10
+
+  if (newr / rrr < 3 / 4) {
+    rrr <- ceiling(newr / 4) * 4
+  }
+
+  newm <- rrr * (10^(ind - 5))
+
+  div <- case_when(
+    (rrr / 5) %% 5 == 0 ~ 5,
+    (rrr / 5) %% 4 == 0 ~ 4,
+    (rrr / 5) %% 3 == 0 ~ 3,
+    .default = 4
+  )
 
   if (log10 != TRUE) {
+    mx <- max(c(newm,10))
+    div <- ifelse(mx > 1, div, 4)
     g <- vdfl %>% ggplot(aes(y = var, x = lm_vif)) +
       geom_point() +
-      xlim(0, max(c(vdf$Log10_lm_vif, 10))) +
+      scale_x_continuous(limits = c(0, mx),
+                         breaks = seq(0, mx, by = mx / div)) +
       ylab(NULL) +
       xlab("VIFs") +
       ggtitle(paste0("Linear VIFs for ", res)) +
       easy_center_title() +
       geom_vline(xintercept = 10, color = "blue")
   } else {
+    mx <- max(c(newm,1))
+    div <- ifelse(mx > 1, div, 4)
     g <- vdfl %>% ggplot(aes(y = var, x = Log10_lm_vif)) +
       geom_point() +
-      xlim(0, max(c(vdf$Log10_lm_vif, 1))) +
+      scale_x_continuous(limits = c(0, mx),
+                         breaks = seq(0, mx, by = mx / div)) +
       ylab(NULL) +
       xlab("log10(VIFs)") +
       ggtitle(paste0("Log10 Linear VIFs for ", res)) +
@@ -146,19 +167,45 @@ robust_vifs <- function(formula, data, model = randomForest,
     vdfm <- vdf
   }
 
+  m <- max(vdfm[4])
+  v <- 10^(-3:6)
+  ind <- findInterval(m, v)
+
+  newr <- m / (10^(ind - 5))
+  rrr <- ceiling(newr / 10) * 10
+
+  if (newr / rrr < 3 / 4) {
+    rrr <- ceiling(newr / 4) * 4
+  }
+
+  newm <- rrr * (10^(ind - 5))
+
+  div <- case_when(
+    (rrr / 5) %% 5 == 0 ~ 5,
+    (rrr / 5) %% 4 == 0 ~ 4,
+    (rrr / 5) %% 3 == 0 ~ 3,
+    .default = 4
+  )
+
   if (log10 != TRUE) {
+    mx <- max(c(newm,10))
+    div <- ifelse(mx > 1, div, 4)
     g2 <- vdfm %>% ggplot(aes(y = var, x = model_vif)) +
       geom_point() +
-      xlim(0, max(c(vdf$model_vif, 10))) +
+      scale_x_continuous(limits = c(0, mx),
+                         breaks = seq(0, mx, by = mx / div)) +
       ylab(NULL) +
       xlab("VIFs") +
       ggtitle(paste0("Non-Linear VIFs for ", res)) +
       easy_center_title() +
       geom_vline(xintercept = 10, color = "blue")
   } else {
+    mx <- max(c(newm,1))
+    div <- ifelse(mx > 1, div, 4)
     g2 <- vdfm %>% ggplot(aes(y = var, x = Log10_model_vif)) +
       geom_point() +
-      xlim(0, max(c(vdf$Log10_model_vif, 1))) +
+      scale_x_continuous(limits = c(0, mx),
+                         breaks = seq(0, mx, by = mx / div)) +
       ylab(NULL) +
       xlab("log10(VIFs)") +
       ggtitle(paste0("Log10 Non-Linear VIFs for ", res)) +

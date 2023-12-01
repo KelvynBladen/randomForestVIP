@@ -27,9 +27,7 @@
 #' pcs$plot_y_part_cors
 #' @export
 
-# fix xlim for all MI plots!!!
 # fix cor for factors, remove or adjust
-# unsupervised forest MI
 
 partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
   if (missing(formula)) {
@@ -125,7 +123,7 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
     cdf$part_cor <- ifelse(is.na(cdf$part_cor), 0, cdf$part_cor)
 
     cdf <- cdf[do.call(base::order, as.list(abs(cdf[2]))), ]
-    cdf$var <- factor(cdf$var, levels = c(cdf$var))
+    cdf$var <- factor(cdf$var, levels = cdf$var)
 
     if (!missing(num_var)) {
       d <- cdf %>%
@@ -194,12 +192,30 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
     mdfa <- mdf
   }
 
+  m <- max(mdfa[3])
+  v <- 10^(-3:6)
+  ind <- findInterval(m, v)
+
+  newr <- m / (10^(ind - 5))
+  rrr <- ceiling(newr / 10) * 10
+
+  if (newr / rrr < 3 / 4) {
+    rrr <- ceiling(newr / 4) * 4
+  }
+
+  newm <- rrr * (10^(ind - 5))
+
+  div <- case_when(
+    (rrr / 5) %% 5 == 0 ~ 5,
+    (rrr / 5) %% 4 == 0 ~ 4,
+    (rrr / 5) %% 3 == 0 ~ 3,
+    .default = 4
+  )
+
   g5 <- mdfa %>% ggplot(aes(y = var, x = urfAccuracy)) +
     geom_point() +
-    xlim(
-      ifelse(any(mdf$urfAccuracy < 0), min(mdf$urfAccuracy), 0),
-      max(mdf$urfAccuracy)
-    ) +
+    scale_x_continuous(limits = c(min(0, mdfa$urfAccuracy), newm),
+                       breaks = seq(0, newm, by = newm / div)) +
     ylab(NULL) +
     xlab("Mutual Information") +
     ggtitle(paste0("URF Accuracy Mutual Information with ", res)) +
@@ -219,12 +235,30 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
     mdfp <- mdf
   }
 
+  m <- max(mdfp[4])
+  v <- 10^(-3:6)
+  ind <- findInterval(m, v)
+
+  newr <- m / (10^(ind - 5))
+  rrr <- ceiling(newr / 10) * 10
+
+  if (newr / rrr < 3 / 4) {
+    rrr <- ceiling(newr / 4) * 4
+  }
+
+  newm <- rrr * (10^(ind - 5))
+
+  div <- case_when(
+    (rrr / 5) %% 5 == 0 ~ 5,
+    (rrr / 5) %% 4 == 0 ~ 4,
+    (rrr / 5) %% 3 == 0 ~ 3,
+    .default = 4
+  )
+
   g6 <- mdfp %>% ggplot(aes(y = var, x = urfPurity)) +
     geom_point() +
-    xlim(
-      ifelse(any(mdf$urfPurity < 0), min(mdf$urfPurity), 0),
-      max(mdf$urfPurity)
-    ) +
+    scale_x_continuous(limits = c(min(0, mdfp$urfPurity), newm),
+                       breaks = seq(0, newm, by = newm / div)) +
     ylab(NULL) +
     xlab("Mutual Information") +
     ggtitle(paste0("URF Purity Mutual Information with ", res)) +
@@ -235,11 +269,11 @@ partial_cor <- function(formula, data = NULL, model = lm, num_var, ...) {
   l$y_mutual_info <- mdf
 
   if (inherits(unlist(mf[1]), "numeric")) {
-    l$plot_y_cors <- g
-    l$plot_abs_y_cors <- g1
+    l$plot_cors <- g
+    l$plot_abs_cors <- g1
+    l$plot_part_cors <- g2
+    l$plot_abs_part_cors <- g3
     l$plot_mutual_info <- g4
-    l$plot_y_part_cors <- g2
-    l$plot_abs_y_part_cors <- g3
     l$plot_urf_accuracy <- g5
     l$plot_urf_purity <- g6
   } else {

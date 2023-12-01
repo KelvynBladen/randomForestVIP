@@ -3,6 +3,7 @@
 #' @importFrom dplyr %>% summarise group_by case_when relocate
 #' @importFrom ggplot2 ggplot geom_point geom_line geom_tile ggtitle facet_grid
 #'   scale_fill_gradient aes scale_x_continuous scale_y_continuous
+#' @importFrom ggeasy easy_center_title
 #' @importFrom caret train trainControl
 #' @importFrom rlang .data
 #' @description This function uses caret grid training results to generate
@@ -114,9 +115,10 @@ caret_plot <- function(x, sqrt = FALSE, marg1 = FALSE, marg2 = FALSE,
         breaks = seq(0, newm[1], by = newm[1] / div[1])
       ) +
       ggtitle(paste0(
-        "model ", colnames(res)[length(res) - 1],
+        colnames(res)[length(res) - 1],
         " across ", colnames(res)[1]
-      ))
+      )) +
+      easy_center_title()
 
     g_rk <- res %>%
       ggplot(aes(
@@ -134,9 +136,10 @@ caret_plot <- function(x, sqrt = FALSE, marg1 = FALSE, marg2 = FALSE,
         breaks = seq(0, newm[2], by = newm[2] / div[2])
       ) +
       ggtitle(paste0(
-        "model ", colnames(res)[length(res)],
+        colnames(res)[length(res)],
         " across ", colnames(res)[1]
-      ))
+      )) +
+      easy_center_title()
   }
 
   if (length(res) == 4) {
@@ -248,9 +251,10 @@ caret_plot <- function(x, sqrt = FALSE, marg1 = FALSE, marg2 = FALSE,
             breaks = seq(0, newm[1], by = newm[1] / div[1])
           ) +
           ggtitle(paste0(
-            "model ", colnames(marg)[length(marg) - 1],
+            colnames(marg)[length(marg) - 1],
             " across ", colnames(marg)[1]
-          ))
+          )) +
+          easy_center_title()
 
         g_m2 <- marg %>%
           ggplot(aes(
@@ -264,9 +268,10 @@ caret_plot <- function(x, sqrt = FALSE, marg1 = FALSE, marg2 = FALSE,
             breaks = seq(0, newm[2], by = newm[2] / div[2])
           ) +
           ggtitle(paste0(
-            "model ", colnames(marg)[length(marg)],
+            colnames(marg)[length(marg)],
             " across ", colnames(marg)[1]
-          ))
+          )) +
+          easy_center_title()
 
         l$data <- marg
 
